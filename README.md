@@ -19,9 +19,11 @@ For Arch Linux and Arch-based distributions, run this one line as your regular u
 git clone https://github.com/bat-fun/dotfile.git && cd dotfile && ./install.sh
 ```
 
-The installer is interactive. It checks for `pacman`, offers the base packages and AUR extras, and asks before backing up existing config paths and linking this checkout. It offers the larger Hyprland package group when Hyprland is not detected. Backups go to a timestamped `~/.dotfiles-backup-*` directory. It can also offer a wallpaper collection when none is found, and uses Matugen to generate colors when Matugen and a usable wallpaper are available.
+The installer is interactive. It checks for `pacman`, audits installed packages, and offers only missing base, Hyprland desktop, and AUR packages. It asks before backing up existing config paths and linking this checkout. Backups go to a timestamped `~/.dotfiles-backup-*` directory. It also audits configured runtime commands, can offer a wallpaper collection when none is found, and uses Matugen to generate colors when Matugen and a usable wallpaper are available. The Arc Noir SDDM theme is an optional system-wide install; the installer copies it into SDDM's theme directory and selects it in a dedicated config drop-in, but does not enable or switch display managers.
 
-Run with `./install.sh --help` to see the optional dry-run and package-skip switches. Run the installer from a normal user account with `sudo` available; do not launch it as root because yay builds must run as a regular user.
+After setup, the installer asks whether to reboot now. If you agree, it schedules a one-time ASCII welcome, a short Linux quote, and useful keybinding hints for the next interactive Bash session, then requests a reboot through `sudo systemctl reboot`. Declining leaves the system running; reboot later with `sudo systemctl reboot` when convenient.
+
+Run with `./install.sh --help` to see the optional dry-run and package-skip switches. Dry-run previews the changes without writing to your home directory or changing script permissions. Run the installer from a normal user account with `sudo` available; do not launch it as root because yay builds must run as a regular user.
 
 ## What’s Inside
 
@@ -35,11 +37,12 @@ Run with `./install.sh --help` to see the optional dry-run and package-skip swit
 | `matugen/`      | Color templates and generated theme files         |
 | `wlogout/`      | Logout menu layout and styling                    |
 | `gtk-3.0/`      | GTK 3 appearance settings                         |
+| `sddm/arc-noir/` | Arc Noir SDDM greeter theme and bundled artwork   |
 | `starship.toml` | Starship prompt configuration                     |
 | `install.sh`    | Interactive Arch / Arch-based installer           |
 | `uninstall.sh`  | Interactive normal uninstall or full reset        |
 
-The package choices include common networking, Bluetooth, audio, and font packages, plus the Hyprland desktop utilities when that package group is offered. Brave and wlogout are offered as AUR extras. VS Code is optional and is not installed automatically.
+The package choices include common networking, Bluetooth, audio, and font packages, plus configured Hyprland desktop utilities, Code - OSS, and rofimoji. Brave and wlogout are offered as AUR extras. If you decline a package group, the runtime audit reports commands that remain unavailable.
 
 ## Keybindings
 
@@ -109,7 +112,7 @@ Hardware keys depend on keyboard and device support. Media shortcuts use PipeWir
 - Edit bindings in `hypr/module/binds.lua`.
 - Adjust compositor appearance and autostart in `hypr/hyprland.lua` and animations in `hypr/module/animation.lua`.
 - Pick a wallpaper with `SUPER + D`; Matugen can then generate matching colors for the supported apps.
-- Starship initialization is added to `~/.bashrc` by the installer if it is not already present.
+- If Starship is installed, its initialization is added to `~/.bashrc` when missing; the installer leaves the file unchanged otherwise.
 
 After changing the Hyprland configuration, reload it with `hyprctl reload` when supported by your Lua configuration runner, or restart the session.
 
@@ -121,7 +124,7 @@ Run:
 ./uninstall.sh
 ```
 
-Choose a normal uninstall to remove linked dotfile paths while keeping wallpapers and installer backups; it may separately ask about known runtime caches. Full reset offers removal of wallpapers, screenshots, caches, and installer backups. The uninstaller only removes config entries that are symlinks; it leaves regular files and directories alone.
+Choose a normal uninstall to remove linked dotfile paths while keeping wallpapers and installer backups; it may separately ask about known runtime caches. Full reset offers removal of wallpapers, screenshots, caches, and installer backups. If Arc Noir was installed by this repository, full reset can remove its managed SDDM theme/config and restore saved prior files. The uninstaller removes a config symlink only when it resolves to the matching path in this checkout; unrelated symlinks, regular files, and directories are preserved.
 
 ## A Small Note
 

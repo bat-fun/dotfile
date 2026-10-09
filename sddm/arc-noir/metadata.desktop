@@ -1,0 +1,11 @@
+[SddmGreeterTheme]
+Name=Arc Noir
+Description=A cinematic graphite login theme with a Batman backdrop
+Author=Arc
+License=CC-BY-SA
+Type=sddm-theme
+Version=1.0
+MainScript=MainCenter.qml
+ConfigFile=theme.conf
+Theme-Id=arc-noir
+Theme-API=2.0
