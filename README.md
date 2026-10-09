@@ -27,20 +27,20 @@ Run with `./install.sh --help` to see the optional dry-run and package-skip swit
 
 ## What’s Inside
 
-| Path            | What it does                                      |
-| --------------- | ------------------------------------------------- |
-| `hypr/`         | Hyprland Lua config, modules, and desktop scripts |
-| `waybar/`       | Bar layout and styling                            |
-| `rofi/`         | Application launcher and wallpaper picker themes  |
-| `kitty/`        | Terminal configuration                            |
-| `dunst/`        | Desktop notifications                             |
-| `matugen/`      | Color templates and generated theme files         |
-| `wlogout/`      | Logout menu layout and styling                    |
-| `gtk-3.0/`      | GTK 3 appearance settings                         |
+| Path             | What it does                                      |
+| ---------------- | ------------------------------------------------- |
+| `hypr/`          | Hyprland Lua config, modules, and desktop scripts |
+| `waybar/`        | Bar layout and styling                            |
+| `rofi/`          | Application launcher and wallpaper picker themes  |
+| `kitty/`         | Terminal configuration                            |
+| `dunst/`         | Desktop notifications                             |
+| `matugen/`       | Color templates and generated theme files         |
+| `wlogout/`       | Logout menu layout and styling                    |
+| `gtk-3.0/`       | GTK 3 appearance settings                         |
 | `sddm/arc-noir/` | Arc Noir SDDM greeter theme and bundled artwork   |
-| `starship.toml` | Starship prompt configuration                     |
-| `install.sh`    | Interactive Arch / Arch-based installer           |
-| `uninstall.sh`  | Interactive normal uninstall or full reset        |
+| `starship.toml`  | Starship prompt configuration                     |
+| `install.sh`     | Interactive Arch / Arch-based installer           |
+| `uninstall.sh`   | Interactive normal uninstall or full reset        |
 
 The package choices include common networking, Bluetooth, audio, and font packages, plus configured Hyprland desktop utilities, Code - OSS, and rofimoji. Brave and wlogout are offered as AUR extras. If you decline a package group, the runtime audit reports commands that remain unavailable.
 
