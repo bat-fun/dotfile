@@ -1,0 +1,111 @@
+@import "~/.config/matugen/colors/rofi-colors.rasi"
+
+configuration {
+    show-icons: true;
+    kb-cancel: "Escape";
+    kb-accept-entry: "Return";
+}
+
+* {
+    bg: @noir-bg;
+    surface: @noir-surface;
+    surface-alt: @noir-surface-alt;
+    text: @noir-text;
+    muted: @noir-muted;
+    accent: @noir-accent;
+    font: "JetBrainsMono Nerd Font 10";
+    text-color: @text;
+    background-color: transparent;
+}
+
+window {
+    width: 80%;
+    height: 50%;
+    border: 1px;
+    border-color: @noir-outline;
+    border-radius: 4px;
+    border-left: 3px;
+    border-left-color: @accent;
+    background-color: @bg;
+    padding: 10px;
+}
+
+mainbox {
+    spacing: 14px;
+    children: [
+        inputbar,
+        listview
+    ];
+}
+
+inputbar {
+    padding: 10px 12px;
+    background-color: @surface;
+    border: 1px;
+    border-color: @noir-outline;
+    border-radius: 4px;
+
+    children: [
+        prompt,
+        entry
+    ];
+}
+
+prompt {
+    padding: 0 10px 0 0;
+    text-color: @accent;
+}
+
+entry {
+    placeholder: "Choose wallpaper...";
+    placeholder-color: @muted;
+    text-color: @text;
+}
+
+listview {
+    columns: 5;
+    lines: 3;
+    spacing: 6px;
+    scrollbar: true;
+    fixed-height: false;
+}
+
+element {
+    orientation: vertical;
+    padding: 7px;
+    border-radius: 3px;
+    background-color: @surface;
+}
+
+element urgent {
+    background-color: @surface-alt;
+    border: 1px;
+    border-color: @accent;
+}
+
+element selected {
+    background-color: @surface-alt;
+    border: 1px;
+    border-color: @accent;
+    border-radius: 9px;
+}
+
+element-icon {
+    size: 156px;
+    horizontal-align: 0.5;
+}
+
+element-text {
+    padding: 6px 2px 2px 2px;
+    horizontal-align: 0.5;
+    text-color: @muted;
+}
+
+element selected element-text {
+    text-color: @accent;
+}
+
+element urgent element-text {
+    text-color: @accent;
+    font-weight: bold;
+}

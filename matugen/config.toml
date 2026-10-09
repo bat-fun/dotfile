@@ -1,0 +1,34 @@
+[config]
+reload_apps = false
+
+[templates.colors]
+input_path = "~/.config/matugen/templates/colors.css"
+output_path = "~/.config/matugen/colors/colors.css"
+
+[templates.waybar_colors]
+input_path = "~/.config/matugen/templates/waybar-colors.css"
+output_path = "~/.config/waybar/colors.css"
+
+[templates.kitty_colors]
+input_path = "~/.config/matugen/templates/kitty-colors.conf"
+output_path = "~/.config/matugen/colors/kitty-colors.conf"
+
+[templates.rofi_colors]
+input_path = "~/.config/matugen/templates/rofi-colors.rasi"
+output_path = "~/.config/matugen/colors/rofi-colors.rasi"
+
+[templates.hyprlock_colors]
+input_path = "~/.config/matugen/templates/hyprlock-colors.conf"
+output_path = "~/.config/matugen/colors/hyprlock-colors.conf"
+
+[templates.dunst_colors]
+input_path = "~/.config/matugen/templates/dunst-colors.conf"
+output_path = "~/.config/dunst/dunstrc"
+
+[templates.starship]
+input_path = "~/.config/matugen/templates/starship.toml"
+output_path = "~/.config/starship.toml"
+
+[templates.wlogout]
+input_path = "~/.config/matugen/templates/wlogout.css"
+output_path = "~/.config/wlogout/style.css"

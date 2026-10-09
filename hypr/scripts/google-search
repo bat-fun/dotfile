@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+query=$(rofi -dmenu -i -p "Google:" \
+    -theme ~/.config/rofi/config.rasi)
+
+[ -z "$query" ] && exit 0
+
+query="${query// /+}"
+
+brave "https://www.google.com/search?q=$query"

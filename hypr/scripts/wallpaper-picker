@@ -1,0 +1,201 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+require_commands() {
+    local missing=()
+    local command
+
+    for command in "$@"; do
+        command -v "$command" >/dev/null 2>&1 || missing+=("$command")
+    done
+
+    if ((${#missing[@]})); then
+        printf 'Wallpaper picker: missing command(s): %s\n' "${missing[*]}" >&2
+        exit 1
+    fi
+}
+
+notify() {
+    command -v notify-send >/dev/null 2>&1 && notify-send "$@" || true
+}
+
+if command -v awww >/dev/null 2>&1 && command -v awww-daemon >/dev/null 2>&1; then
+    WALLPAPER_COMMAND="awww"
+    WALLPAPER_DAEMON="awww-daemon"
+elif command -v swww >/dev/null 2>&1 && command -v swww-daemon >/dev/null 2>&1; then
+    WALLPAPER_COMMAND="swww"
+    WALLPAPER_DAEMON="swww-daemon"
+else
+    printf 'Wallpaper picker: install either awww or swww and its daemon.\n' >&2
+    exit 1
+fi
+
+require_commands matugen hyprctl shuf pgrep killall
+
+WALLPAPER_DIR="$HOME/Pictures/wallpaper"
+ROFI_THEME="$HOME/.config/rofi/wallpaper-picker.rasi"
+CACHE_FILE="$HOME/.cache/color-wallpaper"
+
+CURRENT_WALLPAPER=""
+if [[ -s "$CACHE_FILE" ]]; then
+    CURRENT_WALLPAPER="$(<"$CACHE_FILE")"
+fi
+
+mapfile -d '' -t WALLPAPERS < <(
+    find "$WALLPAPER_DIR" -maxdepth 1 -type f \
+        \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) \
+        -printf '%f\0' |
+    sort -z
+)
+
+if [ "${#WALLPAPERS[@]}" -eq 0 ]; then
+    notify "Wallpaper Picker" "No wallpapers found"
+    exit 1
+fi
+
+# ---------------------------------------------------------
+# AWWW transitions
+# ---------------------------------------------------------
+
+TRANSITIONS=(
+    fade
+    left
+    right
+    top
+    bottom
+    wipe
+    wave
+    grow
+    center
+    any
+    outer
+)
+
+# ---------------------------------------------------------
+# Apply wallpaper
+# ---------------------------------------------------------
+
+apply_wallpaper() {
+    local selected="$1"
+    local wallpaper="$WALLPAPER_DIR/$selected"
+
+    local transition
+    transition=$(printf '%s\n' "${TRANSITIONS[@]}" | shuf -n 1)
+
+    if [[ "$WALLPAPER_COMMAND" == swww && "$transition" == fade ]]; then
+        transition=simple
+    fi
+
+    local -a image_args=("$wallpaper" --transition-type "$transition" --transition-fps 60)
+    if [[ "$WALLPAPER_COMMAND" == swww ]]; then
+        image_args+=(--transition-step 90)
+    else
+        image_args+=(--transition-duration 1.5)
+    fi
+
+    if ! "$WALLPAPER_COMMAND" img "${image_args[@]}"; then
+        notify "Wallpaper Picker" "Could not apply wallpaper"
+        return 1
+    fi
+
+    if ! matugen \
+        --mode dark \
+        --type scheme-fidelity \
+        --source-color-index 0 \
+        --quiet \
+        image "$wallpaper"; then
+        notify "Wallpaper Picker" "Could not generate theme"
+        return 1
+    fi
+
+    killall -SIGUSR2 waybar 2>/dev/null || true
+    killall -HUP dunst 2>/dev/null || true
+
+    for pid in $(pgrep kitty); do
+        kill -SIGUSR1 "$pid" 2>/dev/null || true
+    done
+
+    hyprctl reload >/dev/null
+
+    mkdir -p -- "$(dirname -- "$CACHE_FILE")"
+    printf '%s\n' "$wallpaper" > "$CACHE_FILE"
+
+    notify \
+        -t 1800 \
+        "Wallpaper changed" \
+        "$selected"
+}
+
+if ! pgrep -x "$WALLPAPER_DAEMON" >/dev/null 2>&1; then
+    "$WALLPAPER_DAEMON" >/dev/null 2>&1 &
+    for _ in {1..20}; do
+        pgrep -x "$WALLPAPER_DAEMON" >/dev/null 2>&1 && break
+        sleep 0.1
+    done
+fi
+
+if ! pgrep -x "$WALLPAPER_DAEMON" >/dev/null 2>&1; then
+    notify "Wallpaper Picker" "Could not start wallpaper daemon"
+    exit 1
+fi
+
+# ---------------------------------------------------------
+# Direct random mode
+# ---------------------------------------------------------
+
+if [[ "${1:-}" = "--random" ]]; then
+    SELECTED=$(printf '%s\n' "${WALLPAPERS[@]}" | shuf -n 1)
+    apply_wallpaper "$SELECTED"
+    exit 0
+fi
+
+require_commands rofi
+
+# ---------------------------------------------------------
+# Build Rofi wallpaper list
+# ---------------------------------------------------------
+
+OPTIONS=("Random")
+
+for wallpaper in "${WALLPAPERS[@]}"; do
+    OPTIONS+=("$wallpaper")
+done
+
+# ---------------------------------------------------------
+# Open picker
+# ---------------------------------------------------------
+
+SELECTED=$(for wallpaper in "${OPTIONS[@]}"; do
+    case "$wallpaper" in
+        *$'\n'*) continue ;;
+    esac
+    if [ "$wallpaper" = "Random" ]; then
+        printf '%s\0icon\x1f%s\0display\x1f%s\0urgent\x1ftrue\n' \
+            "$wallpaper" "preferences-desktop-wallpaper" "Random wallpaper"
+    else
+        label="${wallpaper%.*}"
+        label="${label//-/ }"
+        display="$label"
+        if [[ "$CURRENT_WALLPAPER" == "$WALLPAPER_DIR/$wallpaper" ]]; then
+            display="✓ $label"
+        fi
+        printf '%s\0icon\x1f%s\0display\x1f%s\n' \
+            "$wallpaper" "$WALLPAPER_DIR/$wallpaper" "$display"
+    fi
+done | rofi -dmenu -i -p "Wallpaper" -theme "$ROFI_THEME")
+
+[ -z "$SELECTED" ] && exit 0
+
+# ---------------------------------------------------------
+# Random selection from Rofi
+# ---------------------------------------------------------
+
+if [ "$SELECTED" = "Random" ]; then
+    SELECTED=$(printf '%s\n' "${WALLPAPERS[@]}" | shuf -n 1)
+fi
+
+# ---------------------------------------------------------
+# Apply selected wallpaper
+# ---------------------------------------------------------
+
+apply_wallpaper "$SELECTED"

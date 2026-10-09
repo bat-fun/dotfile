@@ -1,0 +1,16 @@
+:root {
+    --bg: {{colors.background.dark.hex}};
+    --surface: {{colors.surface_container_lowest.dark.hex}};
+    --surface-alt: {{colors.surface_container_high.dark.hex}};
+
+    --text: {{colors.on_background.dark.hex}};
+    --muted: {{colors.on_surface_variant.dark.hex}};
+
+    --accent: {{colors.primary.dark.hex}};
+    --secondary: {{colors.secondary.dark.hex}};
+    --tertiary: {{colors.tertiary.dark.hex}};
+
+    --danger: {{colors.error.dark.hex}};
+    --outline: {{colors.outline.dark.hex}};
+    --signal: {{colors.primary_container.dark.hex}};
+}

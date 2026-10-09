@@ -1,0 +1,228 @@
+# Starship — Developer HUD
+# Compact, Git-aware, runtime-aware, and optimized for daily terminal work.
+
+"$schema" = 'https://starship.rs/config-schema.json'
+palette = 'matugen'
+
+add_newline = true
+scan_timeout = 30
+command_timeout = 1000
+
+format = """
+[╭─](bold primary)$username$hostname$sudo$directory$git_branch$git_status$python$nodejs$rust$golang$lua$docker_context$fill$cmd_duration$status$time
+[╰─](bold primary)$character"""
+
+continuation_prompt = "[│](bold primary) "
+
+# Keep the right side intentionally small.
+# Everything important stays visible without becoming noisy.
+
+[fill]
+symbol = " "
+
+[character]
+format = "$symbol "
+success_symbol = "[❯](bold secondary)"
+error_symbol = "[❯](bold error)"
+vimcmd_symbol = "[❮](bold primary)"
+
+[username]
+style_user = "bold tertiary"
+style_root = "bold error"
+format = "[$user](bold tertiary) "
+show_always = false
+
+[hostname]
+ssh_only = true
+format = "[@$hostname](bold tertiary) "
+
+[sudo]
+disabled = false
+format = "[$symbol]($style)"
+symbol = "⋈ "
+style = "bold tertiary"
+
+[directory]
+style = "bold primary"
+format = "[$path]($style)[$read_only]($read_only_style) "
+home_symbol = "~"
+truncation_length = 3
+truncation_symbol = "…/"
+read_only = " "
+use_os_path_sep = true
+
+# Make repository roots visually distinct.
+repo_root_style = "bold primary"
+repo_root_format = "[$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style)[$read_only]($read_only_style) "
+
+[git_branch]
+symbol = "󰘬 "
+format = "[$symbol$branch]($style) "
+style = "bold primary"
+truncation_length = 24
+truncation_symbol = "…"
+only_attached = true
+
+[git_status]
+style = "bold"
+format = "[$all_status$ahead_behind]($style) "
+
+conflicted = " "
+ahead = "⇡${count} "
+behind = "⇣${count} "
+diverged = "⇕ "
+untracked = "?${count} "
+stashed = "≡${count} "
+modified = "~${count} "
+staged = "+${count} "
+renamed = "»${count} "
+deleted = "✘${count} "
+
+[git_state]
+format = "[$state( $progress_current/$progress_total)]($style) "
+style = "bold tertiary"
+
+[git_metrics]
+disabled = false
+format = "[+$added]($added_style) [-$deleted]($deleted_style) "
+added_style = "bold primary"
+deleted_style = "bold error"
+ignore_submodules = true
+
+[cmd_duration]
+min_time = 2000
+format = "[󱎫 $duration]($style) "
+style = "italic tertiary"
+show_milliseconds = false
+
+[status]
+disabled = false
+format = "[$status]($style) "
+style = "bold error"
+
+[time]
+disabled = false
+format = "[ $time]($style)"
+time_format = "%R"
+style = "dimmed white"
+
+# ─────────────────────────────────────────────
+# Language / runtime context
+# These only appear when you're actually inside
+# a project using the corresponding runtime.
+# ─────────────────────────────────────────────
+
+[python]
+format = "[  $version]($style) "
+symbol = ""
+version_format = "${raw}"
+style = "bold tertiary"
+
+[nodejs]
+format = "[  $version]($style) "
+symbol = ""
+version_format = "${raw}"
+style = "bold primary"
+detect_files = ["package.json", "package-lock.json", "yarn.lock", "pnpm-lock.yaml"]
+detect_folders = ["node_modules"]
+detect_extensions = []
+
+[bun]
+format = "[  $version]($style) "
+symbol = ""
+version_format = "${raw}"
+style = "bold primary"
+
+[rust]
+format = "[  $version]($style) "
+symbol = ""
+version_format = "${raw}"
+style = "bold error"
+
+[golang]
+format = "[ $version]($style) "
+symbol = ""
+version_format = "${raw}"
+style = "bold secondary"
+
+[lua]
+format = "[ $version]($style) "
+symbol = ""
+version_format = "${raw}"
+style = "bold tertiary"
+
+[ruby]
+format = "[ $version]($style) "
+symbol = ""
+version_format = "${raw}"
+style = "bold error"
+
+[swift]
+format = "[ $version]($style) "
+symbol = ""
+version_format = "${raw}"
+style = "bold error"
+
+[deno]
+format = "[ $version]($style) "
+version_format = "${raw}"
+style = "bold primary"
+
+[docker_context]
+format = "[ $context]($style) "
+symbol = ""
+style = "bold secondary"
+
+[package]
+format = "[󰏗 $version]($style) "
+symbol = ""
+style = "bold tertiary"
+
+# ─────────────────────────────────────────────
+# Useful machine context
+# ─────────────────────────────────────────────
+
+[jobs]
+format = "[▶$number]($style) "
+style = "bold primary"
+
+[localip]
+ssh_only = true
+format = "[◯ $localipv4](bold tertiary) "
+
+[battery]
+format = "[$percentage $symbol]($style) "
+
+full_symbol = "█"
+charging_symbol = "↑"
+discharging_symbol = "↓"
+unknown_symbol = "░"
+empty_symbol = "▃"
+
+[[battery.display]]
+threshold = 20
+style = "bold error"
+
+[[battery.display]]
+threshold = 60
+style = "dimmed tertiary"
+
+[[battery.display]]
+threshold = 100
+style = "dimmed tertiary"
+
+[memory_usage]
+disabled = true
+format = "[mem $ram]($style) "
+symbol = ""
+style = "bold tertiary"
+
+
+[palettes.matugen]
+primary = "#a5cbe7"
+secondary = "#bac8d4"
+tertiary = "#f1bc8d"
+error = "#ffb4ab"
+text = "#e2e2e4"
+muted = "#c2c7cd"
+surface = "#0c0e10"

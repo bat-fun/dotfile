@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+for cmd in cliphist rofi wl-copy; do
+    command -v "$cmd" >/dev/null 2>&1 || {
+        printf 'clipboard-vault: missing command: %s\n' "$cmd" >&2
+        exit 1
+    }
+done
+
+selection="$(
+    cliphist list |
+        rofi -dmenu -i \
+            -p 'Clipboard' \
+            -display-columns 2 \
+            -theme "$HOME/.config/rofi/control-panel.rasi"
+)" || true
+
+[[ -z "$selection" ]] && exit 0
+
+printf '%s\n' "$selection" | cliphist decode | wl-copy

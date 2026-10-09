@@ -1,0 +1,42 @@
+* {
+    font-family: "JetBrainsMono Nerd Font";
+    font-size: 13px;
+    font-weight: 600;
+    color: {{colors.on_background.dark.hex}};
+}
+
+window {
+    background-color: alpha({{colors.background.dark.hex}}, 0.88);
+}
+
+button {
+    background-color: alpha({{colors.surface_container_lowest.dark.hex}}, 0.94);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 52px;
+    border: 1px solid {{colors.outline.dark.hex}};
+    border-radius: 14px;
+    box-shadow: none;
+    margin: 8px;
+    min-width: 148px;
+    min-height: 116px;
+    padding: 18px;
+    transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+#lock { background-image: image(url("/usr/share/wlogout/icons/lock.png")); }
+#logout { background-image: image(url("/usr/share/wlogout/icons/logout.png")); }
+#reboot { background-image: image(url("/usr/share/wlogout/icons/reboot.png")); }
+#shutdown { background-image: image(url("/usr/share/wlogout/icons/shutdown.png")); }
+#suspend { background-image: image(url("/usr/share/wlogout/icons/suspend.png")); }
+#hibernate { background-image: image(url("/usr/share/wlogout/icons/hibernate.png")); }
+
+button:hover,
+button:focus {
+    background-color: alpha({{colors.surface_container_high.dark.hex}}, 0.98);
+    border-color: {{colors.primary.dark.hex}};
+}
+
+button:active {
+    background-color: alpha({{colors.primary.dark.hex}}, 0.22);
+}

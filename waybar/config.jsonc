@@ -1,0 +1,96 @@
+{
+  "position": "top",
+  "layer": "top",
+  "height": 36,
+  "margin": "12px 24px 0px 24px",
+  "spacing": 0,
+
+  "modules-left": ["custom/arch", "hyprland/workspaces"],
+
+  "modules-center": ["hyprland/window"],
+
+  "modules-right": [
+    // "tray",
+    "network",
+    "bluetooth",
+    // "battery",
+    "pulseaudio",
+    "clock"
+  ],
+
+  "custom/arch": {
+    // "format": " ", Arch btw
+    // "format": "🗿", sigma 
+    "format": "☣",
+    // "format": "😭🙏",
+    
+    "tooltip": true,
+    "tooltip-format": "Arch Linux // Rofi Launcher",
+    "on-click": "rofi -show drun -theme ~/.config/rofi/config.rasi"
+  },
+
+
+  "hyprland/workspaces": {
+    "disable-scroll": false,
+    "all-outputs": true,
+    "sort-by-number": true,
+    // "format": "{id}",
+    "format": "{icon}",
+    "format-icons": { "active": "󰮯", "default": "󰊠" },
+    "on-scroll-up": "hyprctl dispatch workspace e-1",
+    "on-scroll-down": "hyprctl dispatch workspace e+1"
+  },
+
+  "hyprland/window": {
+    "format": "  {}",
+    "max-length": 50,
+    "separate-outputs": true,
+    "on-click-right": "hyprctl dispatch togglefloating"
+  },
+
+  "network": {
+    "format-wifi": " ",
+    "format-ethernet": "󰈀",
+    "format-disconnected": "󰤮",
+    "tooltip-format": "{ifname}\n{ipaddr}",
+    "on-click": "nm-connection-editor",
+    "on-click-right": "kitty -e nmtui"
+  },
+
+  "bluetooth": {
+    "format": "",
+    "format-connected": "",
+    "format-off": "󰂲",
+    "format-disabled": "󰂲",
+    "tooltip-format": "{controller_alias}\n{num_connections} connected",
+    "tooltip-format-connected": "{device_enumerate}",
+    "tooltip-format-enumerate-connected": "{device_alias}",
+    "tooltip-format-enumerate-connected-battery": "{device_alias} ({device_battery_percentage}%)",
+    "on-click": "blueman-manager"
+  },
+
+  "pulseaudio": {
+    "format": "{icon}",
+    "format-muted": "󰖁",
+    "format-icons": {
+      "default": ["󰕿", "󰖀", "󰕾"]
+    },
+    "scroll-step": 5,
+    "tooltip-format": "{volume}%",
+    "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+    "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+",
+    "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+  },
+
+  "battery": {
+    "format": "{icon} {capacity}%",
+    "format-charging": "󰂄 {capacity}%",
+    "format-icons": ["󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
+    "tooltip-format": "{timeTo}\n{capacity}%"
+  },
+
+  "clock": {
+    "format": "{:%I:%M %p}",
+    "tooltip-format": "{:%A · %d %B %Y}"
+  }
+}
