@@ -2,16 +2,17 @@
 ---- KEYBINDINGS ----
 ---------------------
 
-mainMod = "SUPER"
+local programs = require("module.programs")
+local mainMod = "SUPER"
 
 -- Core applications
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 
-hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
-hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
-hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(menu))
-hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser))
-hl.bind(mainMod .. " + C", hl.dsp.exec_cmd(code))
+hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(programs.terminal))
+hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(programs.fileManager))
+hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(programs.menu))
+hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(programs.browser))
+hl.bind(mainMod .. " + C", hl.dsp.exec_cmd(programs.code))
 
 hl.bind(mainMod .. " + G", hl.dsp.exec_cmd("~/.config/hypr/scripts/google-search"))
 
