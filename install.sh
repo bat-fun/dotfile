@@ -23,6 +23,9 @@ CONFIG_PATHS=(
 )
 
 PACKAGES=(
+    xdg-desktop-portal
+    xdg-desktop-portal-hyprland
+    xdg-desktop-portal-gtk
     hyprland waybar rofi rofimoji kitty dunst hyprlock awww
     networkmanager network-manager-applet nm-connection-editor
     bluez bluez-utils blueman
