@@ -1,0 +1,78 @@
+
+#!/usr/bin/env python3
+
+import sys
+
+try:
+    from PIL import Image, ImageOps
+except ImportError:
+    print("Install Pillow: sudo pacman -S python-pillow", file=sys.stderr)
+    sys.exit(1)
+
+
+def main():
+    if len(sys.argv) != 2:
+        print(f"Usage: {sys.argv[0]} IMAGE", file=sys.stderr)
+        return 1
+
+    try:
+        with Image.open(sys.argv[1]) as source:
+            image = ImageOps.exif_transpose(source).convert("RGBA")
+
+            # Treat transparent areas as black.
+            background = Image.new("RGBA", image.size, (0, 0, 0, 255))
+            image = Image.alpha_composite(background, image).convert("RGB")
+
+            # Resize for faster and consistent extraction.
+            image.thumbnail((200, 200), Image.Resampling.LANCZOS)
+
+            # Group similar colors, including dark and neutral colors.
+            quantized = image.quantize(
+                colors=8,
+                method=Image.Quantize.MEDIANCUT,
+                dither=Image.Dither.NONE
+            )
+
+            counts = quantized.getcolors(maxcolors=200 * 200)
+
+            if not counts:
+                raise ValueError("Could not extract wallpaper colors")
+
+            # Get the most frequently occurring color cluster.
+            _, index = max(counts)
+
+            palette = quantized.getpalette()
+            rgb = tuple(palette[index * 3:index * 3 + 3])
+
+            r, g, b = rgb
+
+            # Determine whether the dominant color has meaningful saturation.
+            maximum = max(rgb)
+            minimum = min(rgb)
+
+            saturation = (
+                (maximum - minimum) / maximum
+                if maximum > 0 else 0
+            )
+
+            # Avoid artificial red/colored accents from neutral wallpapers.
+            scheme = (
+                "scheme-monochrome"
+                if saturation < 0.12
+                else "scheme-fidelity"
+            )
+
+            color = f"#{r:02x}{g:02x}{b:02x}"
+
+            print(f"{color} {scheme}")
+
+    except (OSError, ValueError) as error:
+        print(f"Dominant color extraction failed: {error}", file=sys.stderr)
+        return 1
+
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+

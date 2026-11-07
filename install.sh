@@ -29,7 +29,7 @@ PACKAGES=(
     pipewire pipewire-pulse wireplumber
     wl-clipboard cliphist matugen starship
     grim slurp brightnessctl playerctl libnotify
-    dolphin code python
+    dolphin code python python-pillow
     noto-fonts noto-fonts-emoji
     ttf-jetbrains-mono-nerd ttf-font-awesome
     adwaita-icon-theme
@@ -671,18 +671,37 @@ choose_wallpaper() {
     success "Selected $(basename -- "$SELECTED_WALLPAPER")"
 }
 
+
 generate_colors() {
     [[ -n "$SELECTED_WALLPAPER" ]] || return 0
 
+    local color_data
+    local source_color
+    local scheme_type
+
+    log "06 // SHADOWS" "Extracting dominant wallpaper color."
+
+    if ! color_data="$(
+        "$ROOT_DIR/hypr/scripts/dominant-color" "$SELECTED_WALLPAPER" )"; then
+        warning "Could not extract dominant color."
+        return 0
+    fi
+
+    read -r source_color scheme_type <<< "$color_data"
+
     log "06 // SHADOWS" "Generating Matugen palette."
 
-    if matugen --mode dark --type scheme-fidelity \
-        --source-color-index 0 image "$SELECTED_WALLPAPER"; then
-        success "Colors generated."
+    if matugen \
+        --mode dark \
+        --type "$scheme_type" \
+        color hex "$source_color"; then
+
+        success "Colors generated from $source_color ($scheme_type)."
     else
         warning "Matugen failed."
     fi
 }
+
 
 start_services() {
     local unit
