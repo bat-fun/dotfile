@@ -13,7 +13,6 @@ hl.monitor({
     scale    = "auto",
 })
 
-
 -------------------
 ---- AUTOSTART ----
 -------------------
@@ -189,7 +188,7 @@ hl.window_rule({
     float = true,
 
     size = {
-        "monitor_w * 0.75",
+        "monitor_w * 0.50",
         "monitor_h * 0.70",
     },
 

@@ -1,18 +1,14 @@
----------------------
----- KEYBINDINGS ----
----------------------
-
 local programs = require("module.programs")
 local mainMod = "SUPER"
 
 -- Core applications
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 
-hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(programs.terminal))
-hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(programs.fileManager))
 hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(programs.menu))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(programs.browser))
 hl.bind(mainMod .. " + C", hl.dsp.exec_cmd(programs.code))
+hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(programs.fileManager))
+hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(programs.terminal))
 
 hl.bind(mainMod .. " + G", hl.dsp.exec_cmd("~/.config/hypr/scripts/google-search"))
 
@@ -20,25 +16,27 @@ hl.bind(mainMod .. " + G", hl.dsp.exec_cmd("~/.config/hypr/scripts/google-search
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.config/hypr/scripts/wallpaper-picker --random"))
 
 -- Session / UI
-hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("pkill -x waybar || true; waybar"))
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
 hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("wlogout"))
-hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch exit"))
+hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("pkill -x waybar || true; waybar"))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("~/.config/hypr/scripts/wallpaper-picker"))
+hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch exit"))
 
 hl.bind(mainMod .. " + period",hl.dsp.exec_cmd("~/.config/hypr/scripts/emoji-picker"))
--- Clipboard / screenshots
-hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("~/.config/hypr/scripts/clipboard-picker"))
 
-hl.bind("PRINT", hl.dsp.exec_cmd("~/.config/hypr/scripts/screenshot"))
-hl.bind("SHIFT + PRINT", hl.dsp.exec_cmd("~/.config/hypr/scripts/screenshot full"))
+-- Clipboard
+hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("~/.config/hypr/scripts/clipboard-picker"))
 hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd("cliphist wipe && wl-copy --clear && notify-send -t 1800 'Clipboard' 'History cleared'"))
 
+-- Screenshots
+hl.bind("PRINT", hl.dsp.exec_cmd("~/.config/hypr/scripts/screenshot"))
+hl.bind("SHIFT + PRINT", hl.dsp.exec_cmd("~/.config/hypr/scripts/screenshot full"))
+
 -- Window behavior
-hl.bind(mainMod .. " + SPACE", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
-hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen())
+hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))
+hl.bind(mainMod .. " + SPACE", hl.dsp.window.float({ action = "toggle" }))
 
 -- Focus
 hl.bind(mainMod .. " + left", hl.dsp.focus({ direction = "left" }))
@@ -46,11 +44,24 @@ hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
 hl.bind(mainMod .. " + up", hl.dsp.focus({ direction = "up" }))
 hl.bind(mainMod .. " + down", hl.dsp.focus({ direction = "down" }))
 
+-- Move focused window
+hl.bind(mainMod .. " + SHIFT + left", hl.dsp.window.move({ direction = "left" }))
+hl.bind(mainMod .. " + SHIFT + right",hl.dsp.window.move({ direction = "right" }))
+hl.bind(mainMod .. " + SHIFT + up",hl.dsp.window.move({ direction = "up" }))
+hl.bind(mainMod .. " + SHIFT + down",hl.dsp.window.move({ direction = "down" }))
+
+-- Resize focused window
+hl.bind(mainMod .. " + CTRL + left", hl.dsp.window.resize({ x = -40, y = 0, relative = true }))
+hl.bind(mainMod .. " + CTRL + right", hl.dsp.window.resize({ x = 40, y = 0, relative = true }))
+hl.bind(mainMod .. " + CTRL + up", hl.dsp.window.resize({ x = 0, y = -40, relative = true }))
+hl.bind(mainMod .. " + CTRL + down", hl.dsp.window.resize({ x = 0, y = 40, relative = true }))
+
 -- Workspaces
 for i = 1, 10 do
     local key = i % 10
     hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i }))
     hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
+    hl.bind(mainMod .. " + CTRL + " .. key, hl.dsp.window.move({ workspace = i, follow = false }))
 end
 
 
@@ -69,8 +80,8 @@ local function toggle_scratchpad()
                 float = true,
                 center = true,
                 size = {
-                    "monitor_w * 0.75",
-                    "monitor_h * 0.50",
+                    "monitor_w * 0.30",
+                    "monitor_h * 0.60",
                 },
             }
         )
@@ -94,6 +105,7 @@ hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_
 hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { locked = true, repeating = true })
 hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true, repeating = true })
 hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true, repeating = true })
+
 hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"), { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"), { locked = true, repeating = true })
 

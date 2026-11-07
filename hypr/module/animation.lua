@@ -1,226 +1,112 @@
-hl.curve("fluxIn", {
+-- ANIMATIONS --
+
+-- Curves
+hl.curve("smooth", {
     type = "bezier",
-    points = { {0.2, 0.90}, {0.25, 1.00} },
+    points = { {0.22, 1.00}, {0.36, 1.00} },
 })
 
-hl.curve("fluxOut", {
+hl.curve("quick", {
     type = "bezier",
-    points = { {0.70, 0.00}, {0.85, 0.10} },
+    points = { {0.15, 0.00}, {0.10, 1.00} },
 })
 
-hl.curve("fluxMove", {
-    type = "bezier",
-    points = { {0.2, 1.00}, {0.4, 1.00} },
-})
-
-hl.curve("fluxFade", {
-    type = "bezier",
-    points = { {0.25, 0.00}, {0.15, 1.00} },
-})
-
-
--- ============================================================
--- GLOBAL
--- ============================================================
-
+-- Global
 hl.animation({
     leaf = "global",
     enabled = true,
-    speed = 5,
-    bezier = "fluxMove",
+    speed = 4,
+    bezier = "smooth",
 })
 
-
--- ============================================================
--- WINDOWS
--- ============================================================
-
+-- Windows
 hl.animation({
     leaf = "windows",
     enabled = true,
-    speed = 5,
-    bezier = "fluxMove",
-    style = "slide",
-})
-
-hl.animation({
-    leaf = "windowsIn",
-    enabled = true,
-    speed = 5,
-    bezier = "fluxIn",
-    style = "slide right",
+    speed = 4,
+    bezier = "smooth",
+    style = "popin 94%",
 })
 
 hl.animation({
     leaf = "windowsOut",
     enabled = true,
-    speed = 5,
-    bezier = "fluxOut",
-    style = "slide left",
+    speed = 2,
+    bezier = "quick",
 })
 
 hl.animation({
     leaf = "windowsMove",
     enabled = true,
-    speed = 5,
-    bezier = "fluxMove",
+    speed = 4,
+    bezier = "smooth",
+    style = "slide",
 })
 
-
--- ============================================================
--- FADE
--- ============================================================
-
+-- Fade
 hl.animation({
     leaf = "fade",
     enabled = true,
     speed = 2,
-    bezier = "fluxFade",
-})
-
-hl.animation({
-    leaf = "fadeIn",
-    enabled = true,
-    speed = 2,
-    bezier = "fluxIn",
+    bezier = "smooth",
 })
 
 hl.animation({
     leaf = "fadeOut",
     enabled = true,
-    speed = 2,
-    bezier = "fluxOut",
+    speed = 1,
+    bezier = "quick",
 })
 
-hl.animation({
-    leaf = "fadeSwitch",
-    enabled = true,
-    speed = 2,
-    bezier = "fluxFade",
-})
-
-hl.animation({
-    leaf = "fadeDim",
-    enabled = true,
-    speed = 2,
-    bezier = "fluxFade",
-})
-
-
--- ============================================================
--- LAYERS
--- ============================================================
-
+-- Layers / Panels
 hl.animation({
     leaf = "layers",
     enabled = true,
-    speed = 4,
-    bezier = "fluxMove",
-    style = "slide",
+    speed = 3,
+    bezier = "smooth",
+    style = "fade",
 })
 
-hl.animation({
-    leaf = "layersIn",
-    enabled = true,
-    speed = 4,
-    bezier = "fluxIn",
-    style = "slide top",
-})
-
-hl.animation({
-    leaf = "layersOut",
-    enabled = true,
-    speed = 4,
-    bezier = "fluxOut",
-    style = "slide bottom",
-})
-
-
--- ============================================================
--- WORKSPACES
--- ============================================================
-
+-- Workspaces
 hl.animation({
     leaf = "workspaces",
     enabled = true,
-    speed = 5,
-    bezier = "fluxMove",
-    style = "slidefade 40%",
-})
-
-hl.animation({
-    leaf = "workspacesIn",
-    enabled = true,
-    speed = 5,
-    bezier = "fluxIn",
-    style = "slidefade 40%",
-})
-
-hl.animation({
-    leaf = "workspacesOut",
-    enabled = true,
-    speed = 5,
-    bezier = "fluxOut",
-    style = "slidefade 40%",
+    speed = 4,
+    bezier = "smooth",
+    style = "slidefade 18%",
 })
 
 
--- ============================================================
--- SPECIAL WORKSPACE / SCRATCHPAD
--- ============================================================
-
+-- Scratchpad / Special workspace
 hl.animation({
     leaf = "specialWorkspace",
     enabled = true,
-    speed = 5,
-    bezier = "fluxMove",
-    style = "slidefadevert 40%",
-})
-
-hl.animation({
-    leaf = "specialWorkspaceIn",
-    enabled = true,
-    speed = 5,
-    bezier = "fluxIn",
-    style = "slidefadevert 40%",
-})
-
-hl.animation({
-    leaf = "specialWorkspaceOut",
-    enabled = true,
-    speed = 5,
-    bezier = "fluxOut",
-    style = "slidefadevert 40%",
+    speed = 4,
+    bezier = "smooth",
+    style = "slidefadevert 18%",
 })
 
 
--- ============================================================
--- BORDER
--- ============================================================
-
+-- Border
 hl.animation({
     leaf = "border",
     enabled = true,
     speed = 3,
-    bezier = "fluxFade",
+    bezier = "smooth",
 })
 
 hl.animation({
     leaf = "borderangle",
     enabled = true,
-    speed = 6,
-    bezier = "fluxMove",
+    speed = 5,
+    bezier = "smooth",
     style = "once",
 })
 
-
--- ============================================================
--- ZOOM
--- ============================================================
-
+-- Zoom
 hl.animation({
     leaf = "zoomFactor",
     enabled = true,
-    speed = 5,
-    bezier = "fluxMove",
+    speed = 4,
+    bezier = "smooth",
 })
