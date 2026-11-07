@@ -98,12 +98,25 @@ apply_wallpaper() {
         return 1
     fi
 
+    local color_data
+    local source_color
+    local scheme_type
+
+    if ! color_data="$(
+        "$HOME/.config/hypr/scripts/dominant-color" "$wallpaper"
+    )"; then
+        notify "Wallpaper Picker" "Could not extract dominant color"
+        return 1
+    fi
+
+    read -r source_color scheme_type <<< "$color_data"
+
     if ! matugen \
         --mode dark \
-        --type scheme-fidelity \
-        --source-color-index 0 \
+        --type "$scheme_type" \
         --quiet \
-        image "$wallpaper"; then
+        color hex "$source_color"; then
+
         notify "Wallpaper Picker" "Could not generate theme"
         return 1
     fi
