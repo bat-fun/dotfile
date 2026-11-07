@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
@@ -7,11 +6,17 @@ set -Eeuo pipefail
 # ARCH LINUX | HYPRLAND
 # ============================================================
 
+[[ -n "${HOME:-}" ]] || {
+    printf '[ERROR] HOME is not set.\n' >&2
+    exit 1
+}
+
 ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}"
 WALLPAPER_DIR="$HOME/Pictures/wallpaper"
 WALLPAPER_REPO="https://github.com/bat-fun/wallpaper.git"
+BASHRC="$HOME/.bashrc"
 
 CONFIG_PATHS=(
     dunst gtk-3.0 hypr kitty matugen rofi waybar wlogout starship.toml
@@ -37,10 +42,16 @@ STAGE_DIR=""
 BUILD_DIR=""
 SELECTED_WALLPAPER=""
 KEEP_STAGE=0
+DEPLOYMENT_ACTIVE=0
+INSTALL_CANCELLED=0
+INSTALL_LOCK_FD=""
 
+# Paths enrolled in the current deployment transaction. The original-state
+# map is populated before any corresponding filesystem operation.
+declare -a TRANSACTION_PATHS=()
+declare -A ORIGINAL_PATH_EXISTS=()
 declare -a MISSING_PACKAGES=()
 declare -a MISSING_AUR=()
-declare -a INSTALLED_PATHS=()
 
 if [[ -t 1 ]]; then
     RED='\033[1;38;5;203m'
@@ -58,7 +69,7 @@ banner() {
       _   _  ___  ___ ___
      | \ | |/ _ \|_ _| _ \
      |  \| | (_) || ||   /
-     |_|\__|\___/|___|_|_\
+     |_\__\___/|___|_|_\
 EOF
     printf '%b' "$RESET"
     printf '  DOTFILES INSTALLER\n'
@@ -103,8 +114,8 @@ ask() {
 
         case "$answer" in
             "")
-                [[ "$default" == yes ]]
-                return
+                [[ "$default" == yes ]] && return 0
+                return 1
                 ;;
             y|yes) return 0 ;;
             n|no) return 1 ;;
@@ -113,28 +124,139 @@ ask() {
     done
 }
 
+rollback_configs() {
+    local index path destination previous had_original
+    local rollback_failed=0
+
+    (( DEPLOYMENT_ACTIVE )) || return 0
+
+    warning "An unfinished configuration deployment was detected. Rolling back."
+
+    for ((index=${#TRANSACTION_PATHS[@]} - 1; index>=0; index--)); do
+        path="${TRANSACTION_PATHS[$index]}"
+        destination="$CONFIG_DIR/$path"
+        previous="$STAGE_DIR/rollback/$path"
+        had_original="${ORIGINAL_PATH_EXISTS[$path]:-0}"
+
+        if [[ "$had_original" == 1 ]]; then
+            if [[ -e "$previous" || -L "$previous" ]]; then
+                if [[ -e "$destination" || -L "$destination" ]]; then
+                    if ! rm -rf -- "$destination"; then
+                        KEEP_STAGE=1
+                        rollback_failed=1
+                        error "Could not remove partially installed path: $destination"
+                        continue
+                    fi
+                fi
+
+                if ! mkdir -p -- "$(dirname -- "$destination")"; then
+                    KEEP_STAGE=1
+                    rollback_failed=1
+                    error "Could not recreate parent directory for: $destination"
+                    continue
+                fi
+
+                if ! mv -- "$previous" "$destination"; then
+                    KEEP_STAGE=1
+                    rollback_failed=1
+                    error "Could not restore original configuration: $destination"
+                else
+                    success "Restored $path"
+                fi
+            elif [[ ! -e "$destination" && ! -L "$destination" ]]; then
+                # The original existed, but neither its rollback copy nor its
+                # original destination remains. Preserve the staging area.
+                KEEP_STAGE=1
+                rollback_failed=1
+                error "Original configuration could not be located: $destination"
+            fi
+            # If there is no rollback copy but destination exists, the move of
+            # the original never happened; leave that original untouched.
+        else
+            if [[ -e "$destination" || -L "$destination" ]]; then
+                if ! rm -rf -- "$destination"; then
+                    KEEP_STAGE=1
+                    rollback_failed=1
+                    error "Could not remove newly installed path: $destination"
+                fi
+            fi
+        fi
+    done
+
+    if (( rollback_failed )); then
+        KEEP_STAGE=1
+        warning "Rollback was incomplete. Recovery files will be preserved."
+        DEPLOYMENT_ACTIVE=0
+        return 1
+    fi
+
+    DEPLOYMENT_ACTIVE=0
+    TRANSACTION_PATHS=()
+    ORIGINAL_PATH_EXISTS=()
+    success "Configuration rollback completed."
+    return 0
+}
+
 cleanup() {
+    local status=$?
+
+    # Prevent recursive EXIT handling and defer further catchable signals
+    # while recovery is running.
+    trap - EXIT INT TERM HUP
+    trap '' INT TERM HUP
+
+    if (( DEPLOYMENT_ACTIVE )); then
+        if ! rollback_configs; then
+            status=1
+        fi
+    fi
+
     if [[ -n "$STAGE_DIR" && -d "$STAGE_DIR" ]]; then
         if (( KEEP_STAGE )); then
             warning "Recovery files preserved: $STAGE_DIR"
-        else
-            rm -rf -- "$STAGE_DIR"
+        elif ! rm -rf -- "$STAGE_DIR"; then
+            warning "Could not remove staging directory: $STAGE_DIR"
+            (( status != 0 )) || status=1
         fi
     fi
 
     if [[ -n "$BUILD_DIR" && -d "$BUILD_DIR" ]]; then
-        rm -rf -- "$BUILD_DIR"
+        if ! rm -rf -- "$BUILD_DIR"; then
+            warning "Could not remove temporary build directory: $BUILD_DIR"
+            (( status != 0 )) || status=1
+        fi
     fi
+
+    exit "$status"
+}
+
+handle_signal() {
+    local signal="$1"
+    local exit_code=1
+
+    case "$signal" in
+        INT)  exit_code=130 ;;
+        TERM) exit_code=143 ;;
+        HUP)  exit_code=129 ;;
+    esac
+
+    warning "Received SIG$signal. Exiting and attempting safe cleanup."
+    exit "$exit_code"
 }
 
 trap cleanup EXIT
+trap 'handle_signal INT' INT
+trap 'handle_signal TERM' TERM
+trap 'handle_signal HUP' HUP
 
 validate_environment() {
     log "01 // SYSTEM CHECK" "Checking the environment."
 
-    [[ -n "${HOME:-}" ]] || die "HOME is not set."
     [[ "$EUID" -ne 0 ]] || die "Run as your normal user."
     [[ -t 0 ]] || die "Run from an interactive terminal."
+
+    [[ "$CONFIG_DIR" == /* ]] || die "XDG_CONFIG_HOME must be an absolute path."
+    [[ "$DATA_DIR" == /* ]] || die "XDG_DATA_HOME must be an absolute path."
 
     command -v pacman >/dev/null 2>&1 ||
         die "Arch Linux is required."
@@ -142,12 +264,24 @@ validate_environment() {
     command -v git >/dev/null 2>&1 ||
         die "Install Git first: sudo pacman -S git"
 
+    command -v flock >/dev/null 2>&1 ||
+        die "flock is required (provided by util-linux)."
+
     for path in "${CONFIG_PATHS[@]}"; do
         [[ -e "$ROOT_DIR/$path" || -L "$ROOT_DIR/$path" ]] ||
             die "Missing repository configuration: $path"
     done
 
-    mkdir -p -- "$CONFIG_DIR" "$HOME/Pictures"
+    mkdir -p -- "$CONFIG_DIR" "$DATA_DIR" "$HOME/Pictures" ||
+        die "Could not create required user directories."
+
+    # Keep the lock file in the user's data directory. Do not delete it after
+    # unlocking: removing a lock file can create races between concurrent runs.
+    exec {INSTALL_LOCK_FD}>"$DATA_DIR/.noir-installer.lock" ||
+        die "Could not open installer lock file."
+
+    flock -n "$INSTALL_LOCK_FD" ||
+        die "Another instance of this installer is already running."
 
     success "Environment validated."
 }
@@ -180,7 +314,7 @@ check_official_packages() {
     }
 
     command -v sudo >/dev/null 2>&1 ||
-        die "sudo is required."
+        die "sudo is required to install official packages."
 
     sudo pacman -S --needed "${MISSING_PACKAGES[@]}"
 }
@@ -196,20 +330,32 @@ get_aur_helper() {
 install_yay() {
     log "03 // AUR" "Preparing yay."
 
+    command -v sudo >/dev/null 2>&1 ||
+        die "sudo is required to install yay."
+
     sudo pacman -S --needed base-devel git
 
-    BUILD_DIR="$(mktemp -d "${TMPDIR:-/tmp}/noir-yay.XXXXXXXX")"
+    BUILD_DIR="$(mktemp -d -- "${TMPDIR:-/tmp}/noir-yay.XXXXXXXX")" ||
+        die "Could not create yay build directory."
 
     git clone --depth 1 \
-        https://aur.archlinux.org/yay.git "$BUILD_DIR/yay"
+        https://aur.archlinux.org/yay.git "$BUILD_DIR/yay" ||
+        die "Could not clone the yay AUR repository."
+
+    warning "Review the PKGBUILD in $BUILD_DIR/yay before continuing."
+    ask "Build and install yay from this PKGBUILD?" yes ||
+        die "yay installation cancelled."
 
     (
-        cd "$BUILD_DIR/yay"
+        cd "$BUILD_DIR/yay" || exit 1
         makepkg -si
     )
 
-    rm -rf -- "$BUILD_DIR"
-    BUILD_DIR=""
+    if rm -rf -- "$BUILD_DIR"; then
+        BUILD_DIR=""
+    else
+        warning "Could not remove yay build directory: $BUILD_DIR"
+    fi
 
     command -v yay >/dev/null 2>&1 ||
         die "yay installation could not be verified."
@@ -241,7 +387,10 @@ check_aur_packages() {
     helper="$(get_aur_helper || true)"
 
     if [[ -z "$helper" ]]; then
-        ask "Build yay because no AUR helper exists?" yes || return 0
+        ask "Build yay because no AUR helper exists?" yes || {
+            warning "Skipping AUR applications."
+            return 0
+        }
         install_yay
         helper="yay"
     fi
@@ -250,45 +399,30 @@ check_aur_packages() {
 }
 
 validate_configs() {
-    local path
+    local path source
 
     for path in "${CONFIG_PATHS[@]}"; do
-        [[ -e "$ROOT_DIR/$path" || -L "$ROOT_DIR/$path" ]] ||
+        source="$ROOT_DIR/$path"
+
+        [[ -e "$source" || -L "$source" ]] ||
             die "Missing source: $path"
 
+        # This installer copies real files/directories into CONFIG_DIR; it
+        # never creates repo-to-~/.config symlinks. Reject symlinks anywhere
+        # in the source tree too, because cp -a would otherwise preserve them.
+        [[ ! -L "$source" ]] ||
+            die "Source configuration must not be a symlink: $path"
+
+        if find "$source" -type l -print -quit | grep -q .; then
+            die "Symbolic links are not allowed inside configuration source: $path"
+        fi
+
         if [[ "$path" == starship.toml ]]; then
-            [[ -f "$ROOT_DIR/$path" ]] ||
+            [[ -f "$source" ]] ||
                 die "Expected a regular file: $path"
         else
-            [[ -d "$ROOT_DIR/$path" ]] ||
+            [[ -d "$source" ]] ||
                 die "Expected a directory: $path"
-        fi
-    done
-}
-
-rollback_configs() {
-    local index path destination previous
-
-    warning "Deployment failed. Rolling back."
-
-    for ((index=${#INSTALLED_PATHS[@]} - 1; index>=0; index--)); do
-        path="${INSTALLED_PATHS[$index]}"
-        destination="$CONFIG_DIR/$path"
-        previous="$STAGE_DIR/rollback/$path"
-
-        if ! rm -rf -- "$destination"; then
-            KEEP_STAGE=1
-            error "Could not remove: $destination"
-            continue
-        fi
-
-        if [[ -e "$previous" || -L "$previous" ]]; then
-            mkdir -p -- "$(dirname -- "$destination")"
-
-            if ! mv -- "$previous" "$destination"; then
-                KEEP_STAGE=1
-                error "Could not restore: $destination"
-            fi
         fi
     done
 }
@@ -306,7 +440,11 @@ install_configs() {
         printf '    %s\n' "$CONFIG_DIR/$path"
     done
 
-    ask "Continue with installation?" no || return 1
+    if ! ask "Continue with installation?" no; then
+        warning "Configuration installation cancelled."
+        INSTALL_CANCELLED=1
+        return 0
+    fi
 
     for path in "${CONFIG_PATHS[@]}"; do
         destination="$CONFIG_DIR/$path"
@@ -315,8 +453,11 @@ install_configs() {
         fi
     done
 
-    STAGE_DIR="$(mktemp -d "$CONFIG_DIR/.noir-install.XXXXXXXX")"
-    mkdir -p "$STAGE_DIR/payload" "$STAGE_DIR/rollback"
+    STAGE_DIR="$(mktemp -d -- "$CONFIG_DIR/.noir-install.XXXXXXXX")" ||
+        die "Could not create configuration staging directory."
+
+    mkdir -p -- "$STAGE_DIR/payload" "$STAGE_DIR/rollback" ||
+        die "Could not create staging subdirectories."
 
     for path in "${CONFIG_PATHS[@]}"; do
         cp -a -- "$ROOT_DIR/$path" "$STAGE_DIR/payload/$path" ||
@@ -326,16 +467,24 @@ install_configs() {
     if ((${#existing[@]})); then
         printf '\n  Existing configurations detected:\n'
         printf '    %s\n' "${existing[@]}"
+        warning "Disabling backups means there will be no permanent copy after a successful deployment."
 
         if ask "Back up existing configurations?" yes; then
-            mkdir -p "$DATA_DIR/dotfile-backups"
-            BACKUP_DIR="$(mktemp -d "$DATA_DIR/dotfile-backups/noir-XXXXXXXX")"
-            chmod 700 "$BACKUP_DIR"
+            mkdir -p -- "$DATA_DIR/dotfile-backups" ||
+                die "Could not create permanent backup directory."
+
+            BACKUP_DIR="$(mktemp -d -- "$DATA_DIR/dotfile-backups/noir-XXXXXXXX")" ||
+                die "Could not create permanent backup location."
+
+            chmod 700 -- "$BACKUP_DIR" ||
+                die "Could not secure permanent backup directory."
 
             for path in "${existing[@]}"; do
                 destination="$CONFIG_DIR/$path"
                 backup_path="$BACKUP_DIR/$path"
-                mkdir -p "$(dirname "$backup_path")"
+
+                mkdir -p -- "$(dirname -- "$backup_path")" ||
+                    die "Could not create backup path for $path."
 
                 cp -a -- "$destination" "$backup_path" ||
                     die "Backup failed for $path."
@@ -349,7 +498,12 @@ install_configs() {
         fi
     fi
 
-    INSTALLED_PATHS=()
+    # Start the transaction before the first destructive move. Record whether
+    # each destination existed before enrolling it, so recovery can distinguish
+    # an untouched original from a newly installed path.
+    DEPLOYMENT_ACTIVE=1
+    TRANSACTION_PATHS=()
+    ORIGINAL_PATH_EXISTS=()
 
     for path in "${CONFIG_PATHS[@]}"; do
         destination="$CONFIG_DIR/$path"
@@ -357,24 +511,56 @@ install_configs() {
         previous="$STAGE_DIR/rollback/$path"
 
         if [[ -e "$destination" || -L "$destination" ]]; then
-            if ! mv -- "$destination" "$previous"; then
-                rollback_configs
-                return 1
-            fi
+            ORIGINAL_PATH_EXISTS["$path"]=1
+        else
+            ORIGINAL_PATH_EXISTS["$path"]=0
+        fi
+        TRANSACTION_PATHS+=("$path")
+
+        if [[ "${ORIGINAL_PATH_EXISTS[$path]}" == 1 ]]; then
+            mv -- "$destination" "$previous" ||
+                die "Could not move existing configuration into rollback storage: $path"
         fi
 
-        INSTALLED_PATHS+=("$path")
-
-        if ! mv -- "$source" "$destination"; then
-            rollback_configs
-            return 1
-        fi
+        mv -- "$source" "$destination" ||
+            die "Could not install configuration: $path"
 
         success "Installed $path"
     done
 
-    INSTALLED_PATHS=()
+    # Commit: after this point, failures in optional wallpaper/service setup do
+    # not revert a completed configuration deployment.
+    DEPLOYMENT_ACTIVE=0
+    TRANSACTION_PATHS=()
+    ORIGINAL_PATH_EXISTS=()
     success "Configuration deployment completed."
+}
+
+configure_starship_bashrc() {
+    log "04 // SHELL" "Configuring Starship for Bash."
+
+    if [[ -e "$BASHRC" && ! -f "$BASHRC" ]]; then
+        warning "$BASHRC exists but is not a regular file; skipping Starship setup."
+        return 0
+    fi
+
+    if [[ -f "$BASHRC" ]] && grep -Fq -- 'starship init bash' "$BASHRC"; then
+        success "Starship initialization already exists in ~/.bashrc."
+        return 0
+    fi
+
+    if ! {
+        printf '\n# >>> noir starship init >>>\n'
+        printf 'if command -v starship >/dev/null 2>&1; then\n'
+        printf '    eval "$(starship init bash)"\n'
+        printf 'fi\n'
+        printf '# <<< noir starship init <<<\n'
+    } >> "$BASHRC"; then
+        warning "Could not update ~/.bashrc; add Starship initialization manually."
+        return 0
+    fi
+
+    success "Starship initialization added to ~/.bashrc."
 }
 
 has_wallpapers() {
@@ -391,7 +577,10 @@ fetch_wallpapers() {
 
     log "05 // THE CAVE" "Checking wallpaper collection."
 
-    mkdir -p "$WALLPAPER_DIR"
+    mkdir -p -- "$WALLPAPER_DIR" || {
+        warning "Could not create wallpaper directory."
+        return 0
+    }
 
     if has_wallpapers; then
         success "Existing wallpapers detected."
@@ -400,18 +589,25 @@ fetch_wallpapers() {
 
     warning "No wallpapers found. Cloning collection."
 
-    BUILD_DIR="$(mktemp -d "${TMPDIR:-/tmp}/noir-wallpapers.XXXXXXXX")"
+    BUILD_DIR="$(mktemp -d -- "${TMPDIR:-/tmp}/noir-wallpapers.XXXXXXXX")" || {
+        warning "Could not create temporary wallpaper directory."
+        return 0
+    }
 
     if ! git clone --depth 1 "$WALLPAPER_REPO" "$BUILD_DIR/repo"; then
         warning "Wallpaper download failed."
-        rm -rf "$BUILD_DIR"
+        rm -rf -- "$BUILD_DIR"
         BUILD_DIR=""
         return 0
     fi
 
     while IFS= read -r -d '' image; do
-        if cp -n -- "$image" "$WALLPAPER_DIR/"; then
-            count=$((count + 1))
+        if [[ ! -e "$WALLPAPER_DIR/$(basename -- "$image")" ]]; then
+            if cp -- "$image" "$WALLPAPER_DIR/"; then
+                count=$((count + 1))
+            else
+                warning "Could not copy wallpaper: $(basename -- "$image")"
+            fi
         fi
     done < <(
         find "$BUILD_DIR/repo" -maxdepth 1 -type f \
@@ -420,8 +616,11 @@ fetch_wallpapers() {
             -o -iname '*.gif' \) -print0
     )
 
-    rm -rf "$BUILD_DIR"
-    BUILD_DIR=""
+    if rm -rf -- "$BUILD_DIR"; then
+        BUILD_DIR=""
+    else
+        warning "Could not remove temporary wallpaper directory: $BUILD_DIR"
+    fi
 
     success "Added $count wallpapers."
 }
@@ -447,7 +646,7 @@ choose_wallpaper() {
     printf '\n  AVAILABLE WALLPAPERS\n'
 
     for wallpaper in "${wallpapers[@]}"; do
-        printf '    %d) %s\n' "$index" "$(basename "$wallpaper")"
+        printf '    %d) %s\n' "$index" "$(basename -- "$wallpaper")"
         index=$((index + 1))
     done
 
@@ -469,7 +668,7 @@ choose_wallpaper() {
     fi
 
     SELECTED_WALLPAPER="${wallpapers[$((choice - 1))]}"
-    success "Selected $(basename "$SELECTED_WALLPAPER")"
+    success "Selected $(basename -- "$SELECTED_WALLPAPER")"
 }
 
 generate_colors() {
@@ -496,16 +695,22 @@ start_services() {
     fi
 
     if ask "Enable and start NetworkManager and Bluetooth?" yes; then
-        for unit in NetworkManager.service bluetooth.service; do
-            if systemctl list-unit-files "$unit" --no-legend |
-                grep -q "$unit"; then
-                if sudo systemctl enable --now "$unit"; then
-                    success "$unit enabled and started."
+        if ! command -v sudo >/dev/null 2>&1; then
+            warning "sudo is unavailable; skipping system services."
+        else
+            for unit in NetworkManager.service bluetooth.service; do
+                if systemctl list-unit-files "$unit" --no-legend --no-pager |
+                    grep -F -- "$unit" >/dev/null; then
+                    if sudo systemctl enable --now "$unit"; then
+                        success "$unit enabled and started."
+                    else
+                        warning "Could not start $unit."
+                    fi
                 else
-                    warning "Could not start $unit."
+                    warning "$unit is not installed."
                 fi
-            fi
-        done
+            done
+        fi
     fi
 
     if systemctl --user show-environment >/dev/null 2>&1; then
@@ -572,6 +777,7 @@ finish() {
     printf '\n  NEXT STEPS\n'
     printf '  • Ensure your Hyprland Lua loader provides the hl API.\n'
     printf '  • Log out and back into Hyprland if needed.\n'
+    printf '  • Open a new Bash session to load Starship.\n'
     printf '  • SUPER + W: Wallpaper picker\n'
     printf '  • SUPER + R: Random wallpaper\n'
     printf '  • SUPER + V: Clipboard history\n'
@@ -587,11 +793,13 @@ main() {
     check_official_packages
     check_aur_packages
 
-    install_configs || {
-        warning "Configuration installation cancelled or failed."
-        return 1
-    }
+    install_configs
+    if (( INSTALL_CANCELLED )); then
+        warning "Installation cancelled before configuration deployment."
+        return 0
+    fi
 
+    configure_starship_bashrc
     fetch_wallpapers
     choose_wallpaper
     generate_colors
