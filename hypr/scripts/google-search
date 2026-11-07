@@ -5,6 +5,10 @@ query=$(rofi -dmenu -i -p "Google:" \
 
 [ -z "$query" ] && exit 0
 
-query="${query// /+}"
+if ! command -v python >/dev/null 2>&1; then
+    printf 'google-search: missing command: python\n' >&2
+    exit 1
+fi
 
-brave "https://www.google.com/search?q=$query"
+encoded_query=$(python -c 'from urllib.parse import quote_plus; import sys; print(quote_plus(sys.argv[1]))' "$query")
+exec brave "https://www.google.com/search?q=$encoded_query"

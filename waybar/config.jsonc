@@ -1,8 +1,8 @@
 {
   "position": "top",
   "layer": "top",
-  "height": 36,
-  "margin": "12px 24px 0px 24px",
+  "height": 20,
+  "margin": "1px 20px 0px 20px",
   "spacing": 0,
 
   "modules-left": ["custom/arch", "hyprland/workspaces"],
@@ -19,13 +19,13 @@
   ],
 
   "custom/arch": {
-    // "format": " ", Arch btw
-    // "format": "🗿", sigma 
-    "format": "☣",
+    "format": " ",// Arch btw
+    // "format": "🗿", //sigma
+    // "format": "☣",
     // "format": "😭🙏",
     
     "tooltip": true,
-    "tooltip-format": "Arch Linux // Rofi Launcher",
+    "tooltip-format": "Arch Linux",
     "on-click": "rofi -show drun -theme ~/.config/rofi/config.rasi"
   },
 
@@ -42,8 +42,8 @@
   },
 
   "hyprland/window": {
-    "format": "  {}",
-    "max-length": 50,
+    "format": "  {initialTitle}",
+    "max-length": 16,
     "separate-outputs": true,
     "on-click-right": "hyprctl dispatch togglefloating"
   },
@@ -51,10 +51,11 @@
   "network": {
     "format-wifi": " ",
     "format-ethernet": "󰈀",
-    "format-disconnected": "󰤮",
+    "format-disconnected": "󰤮 ",
     "tooltip-format": "{ifname}\n{ipaddr}",
-    "on-click": "nm-connection-editor",
-    "on-click-right": "kitty -e nmtui"
+    "on-click": "kitty -e nmtui",
+    "on-click-right": "nm-connection-editor"
+
   },
 
   "bluetooth": {

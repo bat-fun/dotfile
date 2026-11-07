@@ -19,7 +19,7 @@ hl.monitor({
 -------------------
 hl.on("hyprland.start", function () 
     hl.exec_cmd("waybar")
-    hl.exec_cmd("awww-daemon")
+    hl.exec_cmd("if command -v awww-daemon >/dev/null 2>&1; then awww-daemon; else swww-daemon; fi")
     hl.exec_cmd("nm-applet")
     hl.exec_cmd("dunst")
     hl.exec_cmd("wl-paste --type text --watch cliphist store")
@@ -42,7 +42,7 @@ hl.env("HYPRCURSOR_SIZE", "16")
 hl.config({
     general = {
         gaps_in  = 4,
-        gaps_out = {top=10, right=2, left=2, bottom=0},
+        gaps_out = {top=2, right=2, left=2, bottom=0},
 
         border_size = 2,
 

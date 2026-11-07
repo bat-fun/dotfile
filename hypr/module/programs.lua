@@ -7,7 +7,7 @@ local programs = {
     browser     = "brave",
     menu        = "rofi -show drun -theme ~/.config/rofi/config.rasi",
     code        = "code",
-    fileManager = "thunar",
+    fileManager = "dolphin",
 }
 
 return programs

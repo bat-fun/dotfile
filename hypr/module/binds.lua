@@ -20,16 +20,16 @@ hl.bind(mainMod .. " + G", hl.dsp.exec_cmd("~/.config/hypr/scripts/google-search
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.config/hypr/scripts/wallpaper-picker --random"))
 
 -- Session / UI
-hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("pkill -x waybar || true; waybar"))
+hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("pkill -x waybar || true; waybar"))
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
 hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("wlogout"))
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch exit"))
-hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("~/.config/hypr/scripts/wallpaper-picker"))
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("~/.config/hypr/scripts/wallpaper-picker"))
 
 hl.bind(mainMod .. " + period",hl.dsp.exec_cmd("~/.config/hypr/scripts/emoji-picker"))
 -- Clipboard / screenshots
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("~/.config/hypr/scripts/clipboard-picker"))
--- hl.bind(mainMod .. " + V",  hl.dsp.exec_cmd("~/.config/hypr/scripts/clipboard-vault"))
+
 hl.bind("PRINT", hl.dsp.exec_cmd("~/.config/hypr/scripts/screenshot"))
 hl.bind("SHIFT + PRINT", hl.dsp.exec_cmd("~/.config/hypr/scripts/screenshot full"))
 hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd("cliphist wipe && wl-copy --clear && notify-send -t 1800 'Clipboard' 'History cleared'"))

@@ -1,131 +1,107 @@
-# ✦ A little more at home
+<div align="center">
 
-> A personal Arch desktop built around Hyprland, warm terminal sessions, and small shortcuts that make the day flow.
+# NOIR / DOTFILES
 
-```text
-╭─────────────────────────────────────────────────────────╮
-│  HYPRLAND  ·  KITTY  ·  WAYBAR  ·  ROFI  ·  MATUGEN   │
-│  tidy configs, deliberate keybinds, wallpaper-made color │
-╰─────────────────────────────────────────────────────────╯
-```
+**A personal Hyprland desktop, tuned for quiet focus and quick movement.**
 
-This repository is my daily-driver setup: a Lua-based Hyprland configuration, a compact app palette, Waybar, Rofi, Dunst, Kitty, Matugen themes, and a handful of desktop scripts. It is opinionated and tuned for my workflow, but the install stays cautious with existing config files.
+`ARCH LINUX` &nbsp;·&nbsp; `HYPRLAND` &nbsp;·&nbsp; `WAYLAND` &nbsp;·&nbsp; `MATUGEN`
+
+<pre>
+┌──────────────────────────────────────────────────────────┐
+│  HYPRLAND      window management / Lua config            │
+│  WAYBAR        compact status, workspaces, system state  │
+│  ROFI          launcher, wallpaper and emoji workflows   │
+│  MATUGEN       colors generated from your wallpaper      │
+└──────────────────────────────────────────────────────────┘
+</pre>
+
+</div>
+
+This is a working desktop, not a universal preset. It is built around an Arch-based Linux system running Hyprland. Read through the requirements and keybindings before installing; the setup expects a few specific applications and a Lua configuration layer that provides the `hl` API.
+
+## The Setup
+
+| Area                 | Included                                                                            |
+| -------------------- | ----------------------------------------------------------------------------------- |
+| Window manager       | Hyprland Lua config, animations, rules, and keybindings                             |
+| Shell of the desktop | Waybar, Rofi, Dunst, Kitty, wlogout, and GTK settings                               |
+| Adaptive color       | Matugen templates for Waybar, Kitty, Rofi, Dunst, and Starship                      |
+| Small tools          | Wallpaper picker, clipboard picker, screenshot helper, emoji picker, and web search |
+
+The palette leans into near-black surfaces, cool light text, and a sharp accent. Set a wallpaper, generate a matching palette, and let the rest of the desktop follow.
+
+## Requirements
+
+**Platform:** Arch Linux or an Arch-based distribution, Hyprland, and a Lua config loader compatible with the global `hl` API used by `hypr/hyprland.lua`. The loader is not included in this repository; make sure it is installed and configured before restarting Hyprland.
+
+**Session essentials:** Waybar, Dunst, NetworkManager applet, `wl-clipboard`, `cliphist`, Kitty, Rofi, Hyprlock, wlogout, and `swww` (or Awww). The Hyprland startup config launches the available wallpaper daemon, `nm-applet`, and the clipboard watchers directly.
+
+**Shortcuts and extras:** Brave, Code - OSS, Dolphin, `rofimoji`, `matugen`, `grim`, `slurp`, `brightnessctl`, `playerctl`, `wpctl`, `nmtui`, `nm-connection-editor`, and `blueman`.
+
+**Fonts:** JetBrainsMono Nerd Font and Font Awesome are used by the desktop styling. GTK is set to Adwaita-dark.
+
+The installer is for Arch Linux and Arch-based distributions. It checks the required packages and offers to install missing packages with `pacman`. Brave and Rofimoji come from the AUR; if you do not already have `yay` or `paru`, the installer can offer to build `yay`. It does not enable services, change display managers, or run the installer as root.
 
 ## Install
 
-For Arch Linux and Arch-based distributions, run this one line as your regular user:
+Paste this into a terminal on Arch Linux:
 
 ```bash
-git clone https://github.com/bat-fun/dotfile.git && cd dotfile && ./install.sh
+sudo pacman -S --needed git && git clone https://github.com/bat-fun/dotfile.git && cd dotfile && ./install.sh
 ```
 
-The installer is interactive. It checks for `pacman`, audits installed packages, and offers only missing base, Hyprland desktop, and AUR packages. It asks before backing up existing config paths and linking this checkout. Backups go to a timestamped `~/.dotfiles-backup-*` directory. It also audits configured runtime commands, can offer a wallpaper collection when none is found, and uses Matugen to generate colors when Matugen and a usable wallpaper are available. The Arc Noir SDDM theme is an optional system-wide install; the installer copies it into SDDM's theme directory and selects it in a dedicated config drop-in, but does not enable or switch display managers.
+The installer walks through package checks and asks before installing missing packages. It then lists every config path it will replace and asks you to continue. If configs already exist, it asks whether to back them up first. Answering `n` means **no backup is made**; those paths are still replaced after your confirmation.
 
-After setup, the installer asks whether to reboot now. If you agree, it schedules a one-time ASCII welcome, a short Linux quote, and useful keybinding hints for the next interactive Bash session, then requests a reboot through `sudo systemctl reboot`. Declining leaves the system running; reboot later with `sudo systemctl reboot` when convenient.
+When it finds wallpapers in `~/Pictures/wallpaper`, choose one to generate matching colors with Matugen. Choose `0` to skip. The installer copies regular files and directories into `~/.config`; it does not create symlinks.
 
-Run with `./install.sh --help` to see the optional dry-run and package-skip switches. Dry-run previews the changes without writing to your home directory or changing script permissions. Run the installer from a normal user account with `sudo` available; do not launch it as root because yay builds must run as a regular user.
-
-## What’s Inside
-
-| Path             | What it does                                      |
-| ---------------- | ------------------------------------------------- |
-| `hypr/`          | Hyprland Lua config, modules, and desktop scripts |
-| `waybar/`        | Bar layout and styling                            |
-| `rofi/`          | Application launcher and wallpaper picker themes  |
-| `kitty/`         | Terminal configuration                            |
-| `dunst/`         | Desktop notifications                             |
-| `matugen/`       | Color templates and generated theme files         |
-| `wlogout/`       | Logout menu layout and styling                    |
-| `gtk-3.0/`       | GTK 3 appearance settings                         |
-| `sddm/arc-noir/` | Arc Noir SDDM greeter theme and bundled artwork   |
-| `starship.toml`  | Starship prompt configuration                     |
-| `install.sh`     | Interactive Arch / Arch-based installer           |
-| `uninstall.sh`   | Interactive normal uninstall or full reset        |
-
-The package choices include common networking, Bluetooth, audio, and font packages, plus configured Hyprland desktop utilities, Code - OSS, and rofimoji. Brave and wlogout are offered as AUR extras. If you decline a package group, the runtime audit reports commands that remain unavailable.
+Run the installer as your normal user. The one-line command uses `sudo` only for installing Git and any packages you approve. AUR packages are built as your normal user. Screenshots are saved to `~/Pictures/screenshots`.
 
 ## Keybindings
 
-`SUPER` means the Super/Windows key. These are the active bindings in `hypr/module/binds.lua`.
+`SUPER` is the Windows/Super key.
 
-### Apps & Desktop
+| Keys                                      | Action                                             |
+| ----------------------------------------- | -------------------------------------------------- |
+| `SUPER + Return`                          | Open Kitty                                         |
+| `SUPER + E`                               | Open Dolphin                                       |
+| `SUPER + A`                               | Open the Rofi launcher                             |
+| `SUPER + B`                               | Open Brave                                         |
+| `SUPER + C`                               | Open Code - OSS                                    |
+| `SUPER + G`                               | Search Google                                      |
+| `SUPER + .`                               | Open the emoji picker                              |
+| `SUPER + V`                               | Open clipboard history                             |
+| `SUPER + SHIFT + V`                       | Clear clipboard history                            |
+| `SUPER + W`                               | Choose a wallpaper                                 |
+| `SUPER + R`                               | Apply a random wallpaper                           |
+| `SUPER + SHIFT + W`                       | Restart Waybar                                     |
+| `SUPER + L`                               | Lock the session                                   |
+| `SUPER + X`                               | Open the logout menu                               |
+| `SUPER + M`                               | Exit Hyprland, using `hyprshutdown` when available |
+| `SUPER + Q`                               | Close the focused window                           |
+| `SUPER + SPACE`                           | Toggle floating                                    |
+| `SUPER + F`                               | Toggle fullscreen                                  |
+| `SUPER + S`                               | Toggle the scratchpad terminal                     |
+| `PRINT` / `SHIFT + PRINT`                 | Select an area / capture the full screen           |
+| `SUPER + 1` … `SUPER + 0`                 | Switch to workspaces 1–10                          |
+| `SUPER + SHIFT + 1` … `SUPER + SHIFT + 0` | Move the focused window to workspaces 1–10         |
 
-| Keys             | Action                                                  |
-| ---------------- | ------------------------------------------------------- |
-| `SUPER + Return` | Open Kitty                                              |
-| `SUPER + E`      | Open Thunar                                             |
-| `SUPER + A`      | Open the Rofi app launcher                              |
-| `SUPER + B`      | Open Brave                                              |
-| `SUPER + C`      | Open VS Code                                            |
-| `SUPER + G`      | Open Google search helper                               |
-| `SUPER + .`      | Open emoji picker                                       |
-| `SUPER + D`      | Open wallpaper picker                                   |
-| `SUPER + R`      | Apply a random wallpaper                                |
-| `SUPER + W`      | Restart Waybar                                          |
-| `SUPER + L`      | Lock the screen                                         |
-| `SUPER + X`      | Open the wlogout menu                                   |
-| `SUPER + M`      | Shut down Hyprland, using `hyprshutdown` when available |
+Audio, microphone, brightness, and media keys are also configured where supported by the hardware.
 
-### Windows & Workspaces
+## Repository Map
 
-| Keys                             | Action                                             |
-| -------------------------------- | -------------------------------------------------- |
-| `SUPER + Q`                      | Close the active window                            |
-| `SUPER + Space`                  | Toggle floating mode                               |
-| `SUPER + P`                      | Toggle pseudo tiling                               |
-| `SUPER + J`                      | Toggle split direction                             |
-| `SUPER + F`                      | Toggle fullscreen                                  |
-| `SUPER + Arrow keys`             | Focus a window in that direction                   |
-| `SUPER + 1` ... `9`, `0`         | Switch to workspaces 1 ... 9, 10                   |
-| `SUPER + SHIFT + 1` ... `9`, `0` | Move the active window to workspaces 1 ... 9, 10   |
-| `SUPER + S`                      | Toggle the centered scratchpad terminal            |
-| `SUPER + SHIFT + S`              | Send the active window to the scratchpad workspace |
-| `SUPER + Mouse wheel`            | Move between workspaces                            |
-| `SUPER + Left mouse drag`        | Move a window                                      |
-| `SUPER + Right mouse drag`       | Resize a window                                    |
-
-### Capture & Clipboard
-
-| Keys                | Action                                         |
-| ------------------- | ---------------------------------------------- |
-| `Print`             | Capture a selected screen region               |
-| `SHIFT + Print`     | Capture the full screen                        |
-| `SUPER + V`         | Open clipboard history                         |
-| `SUPER + SHIFT + V` | Clear clipboard history and clipboard contents |
-
-### Media & Hardware
-
-| Keys                                            | Action                   |
-| ----------------------------------------------- | ------------------------ |
-| `XF86AudioRaiseVolume` / `XF86AudioLowerVolume` | Adjust output volume     |
-| `XF86AudioMute`                                 | Toggle output mute       |
-| `XF86AudioMicMute`                              | Toggle microphone mute   |
-| `XF86MonBrightnessUp` / `XF86MonBrightnessDown` | Adjust screen brightness |
-| `XF86AudioNext` / `XF86AudioPrev`               | Skip media track         |
-| `XF86AudioPlay` / `XF86AudioPause`              | Toggle media playback    |
-
-Hardware keys depend on keyboard and device support. Media shortcuts use PipeWire/WirePlumber and Playerctl; brightness shortcuts use Brightnessctl.
-
-## Personalizing
-
-- Change app commands in `hypr/module/programs.lua`; bindings consume that table.
-- Edit bindings in `hypr/module/binds.lua`.
-- Adjust compositor appearance and autostart in `hypr/hyprland.lua` and animations in `hypr/module/animation.lua`.
-- Pick a wallpaper with `SUPER + D`; Matugen can then generate matching colors for the supported apps.
-- If Starship is installed, its initialization is added to `~/.bashrc` when missing; the installer leaves the file unchanged otherwise.
-
-After changing the Hyprland configuration, reload it with `hyprctl reload` when supported by your Lua configuration runner, or restart the session.
-
-## Uninstall
-
-Run:
-
-```bash
-./uninstall.sh
+```text
+dunst/       notifications
+gtk-3.0/     GTK appearance
+hypr/        Hyprland config, modules, and desktop scripts
+kitty/       terminal
+matugen/     color-generation config and templates
+rofi/        launcher and wallpaper picker themes
+waybar/      status bar
+wlogout/     logout menu
+starship.toml shell prompt
+install.sh   guided package, config, backup, and wallpaper setup
 ```
 
-Choose a normal uninstall to remove linked dotfile paths while keeping wallpapers and installer backups; it may separately ask about known runtime caches. Full reset offers removal of wallpapers, screenshots, caches, and installer backups. If Arc Noir was installed by this repository, full reset can remove its managed SDDM theme/config and restore saved prior files. The uninstaller removes a config symlink only when it resolves to the matching path in this checkout; unrelated symlinks, regular files, and directories are preserved.
+## License
 
-## A Small Note
-
-This is a personal desktop, not a universal preset. The config expects the applications and scripts named above, a Hyprland environment that supports this repository’s Lua `hl` API, and a working Wayland session. The installer helps with common Arch packages, but it cannot supply every external runtime or hardware-specific piece of a desktop.
+No license is included yet. Unless a license is added, standard copyright applies and reuse is not granted by default.

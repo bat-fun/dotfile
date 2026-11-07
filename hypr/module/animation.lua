@@ -1,21 +1,16 @@
--- ============================================================
--- LUMEN FLUX
--- Directional / cinematic / stable
--- ============================================================
-
 hl.curve("fluxIn", {
     type = "bezier",
-    points = { {0.16, 0.90}, {0.22, 1.00} },
+    points = { {0.2, 0.90}, {0.25, 1.00} },
 })
 
 hl.curve("fluxOut", {
     type = "bezier",
-    points = { {0.70, 0.00}, {0.84, 0.10} },
+    points = { {0.70, 0.00}, {0.85, 0.10} },
 })
 
 hl.curve("fluxMove", {
     type = "bezier",
-    points = { {0.22, 1.00}, {0.36, 1.00} },
+    points = { {0.2, 1.00}, {0.4, 1.00} },
 })
 
 hl.curve("fluxFade", {
@@ -40,9 +35,6 @@ hl.animation({
 -- WINDOWS
 -- ============================================================
 
--- Actual style change:
--- no popin / no gnomed
-
 hl.animation({
     leaf = "windows",
     enabled = true,
@@ -62,7 +54,7 @@ hl.animation({
 hl.animation({
     leaf = "windowsOut",
     enabled = true,
-    speed = 4,
+    speed = 5,
     bezier = "fluxOut",
     style = "slide left",
 })
@@ -70,7 +62,7 @@ hl.animation({
 hl.animation({
     leaf = "windowsMove",
     enabled = true,
-    speed = 4,
+    speed = 5,
     bezier = "fluxMove",
 })
 
@@ -78,8 +70,6 @@ hl.animation({
 -- ============================================================
 -- FADE
 -- ============================================================
-
--- Keep fade restrained so movement is the star.
 
 hl.animation({
     leaf = "fade",
@@ -91,7 +81,7 @@ hl.animation({
 hl.animation({
     leaf = "fadeIn",
     enabled = true,
-    speed = 3,
+    speed = 2,
     bezier = "fluxIn",
 })
 
@@ -112,7 +102,7 @@ hl.animation({
 hl.animation({
     leaf = "fadeDim",
     enabled = true,
-    speed = 3,
+    speed = 2,
     bezier = "fluxFade",
 })
 
@@ -140,7 +130,7 @@ hl.animation({
 hl.animation({
     leaf = "layersOut",
     enabled = true,
-    speed = 3,
+    speed = 4,
     bezier = "fluxOut",
     style = "slide bottom",
 })
@@ -150,14 +140,12 @@ hl.animation({
 -- WORKSPACES
 -- ============================================================
 
--- Real spatial travel instead of fade-only.
-
 hl.animation({
     leaf = "workspaces",
     enabled = true,
     speed = 5,
     bezier = "fluxMove",
-    style = "slidefade 30%",
+    style = "slidefade 40%",
 })
 
 hl.animation({
@@ -165,15 +153,15 @@ hl.animation({
     enabled = true,
     speed = 5,
     bezier = "fluxIn",
-    style = "slidefade 30%",
+    style = "slidefade 40%",
 })
 
 hl.animation({
     leaf = "workspacesOut",
     enabled = true,
-    speed = 4,
+    speed = 5,
     bezier = "fluxOut",
-    style = "slidefade 30%",
+    style = "slidefade 40%",
 })
 
 
@@ -181,14 +169,12 @@ hl.animation({
 -- SPECIAL WORKSPACE / SCRATCHPAD
 -- ============================================================
 
--- Different motion language from normal workspaces.
-
 hl.animation({
     leaf = "specialWorkspace",
     enabled = true,
     speed = 5,
     bezier = "fluxMove",
-    style = "slidefadevert 25%",
+    style = "slidefadevert 40%",
 })
 
 hl.animation({
@@ -196,15 +182,15 @@ hl.animation({
     enabled = true,
     speed = 5,
     bezier = "fluxIn",
-    style = "slidefadevert 25%",
+    style = "slidefadevert 40%",
 })
 
 hl.animation({
     leaf = "specialWorkspaceOut",
     enabled = true,
-    speed = 4,
+    speed = 5,
     bezier = "fluxOut",
-    style = "slidefadevert 25%",
+    style = "slidefadevert 40%",
 })
 
 
@@ -219,7 +205,6 @@ hl.animation({
     bezier = "fluxFade",
 })
 
--- One-shot gradient rotation, not a continuous loop.
 hl.animation({
     leaf = "borderangle",
     enabled = true,

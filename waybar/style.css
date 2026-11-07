@@ -4,8 +4,8 @@
   border: none;
   min-height: 0;
 
-  font-family: "JetBrainsMono Nerd Font";
-  /* font-family: "JetBrainsMono Nerd Font", "FontAwesome"; */
+  /* font-family: "JetBrainsMono Nerd Font"; */
+  font-family: "JetBrainsMono Nerd Font", "FontAwesome";
 
   font-size: 13px;
   font-weight: 500;
@@ -45,25 +45,6 @@ window#waybar {
     background 180ms ease;
 }
 
-#custom-control {
-  margin: 3px 0 3px 8px;
-  padding: 0 12px;
-
-  color: @accent;
-  background: alpha(@bg, 0.67);
-  border: 1px solid alpha(@accent, 0.48);
-  border-radius: 13px;
-
-  transition:
-    color 180ms ease,
-    background 180ms ease;
-}
-
-#custom-control:hover {
-  color: @bg;
-  background: @accent;
-}
-
 #custom-arch:hover {
   color: @text;
   background: alpha(@accent, 0.18);
@@ -76,7 +57,7 @@ window#waybar {
 #workspaces {
   margin: 3px 0;
   padding: 0 6px;
-  background: alpha(@bg, 0.76);
+  background: alpha(@bg, 0.67);
   border: 1px solid alpha(@outline, 0.38);
   border-radius: 13px;
 }
@@ -118,7 +99,6 @@ window#waybar {
 
 #window {
   margin: 3px 18px;
-  min-width: 260px;
 
   color: @muted;
   background: alpha(@bg, 0.76);
@@ -146,7 +126,7 @@ window#waybar {
   padding: 0 10px;
 
   color: @muted;
-  background: alpha(@bg, 0.76);
+  background: alpha(@bg, 0.67);
   border: 1px solid alpha(@outline, 0.38);
   border-radius: 13px;
 
@@ -227,7 +207,7 @@ window#waybar {
   margin: 3px 2px 3px 8px;
   padding: 0 14px;
 
-  background: alpha(@bg, 0.76);
+  background: alpha(@bg, 0.67);
   border-radius: 13px;
   text-shadow: none;
 
