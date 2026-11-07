@@ -18,7 +18,7 @@ CONFIG_PATHS=(
 )
 
 PACKAGES=(
-    hyprland waybar rofi kitty dunst hyprlock wlogout awww
+    hyprland waybar rofi rofimoji kitty dunst hyprlock awww
     networkmanager network-manager-applet nm-connection-editor
     bluez bluez-utils blueman
     pipewire pipewire-pulse wireplumber
@@ -30,7 +30,7 @@ PACKAGES=(
     adwaita-icon-theme
 )
 
-AUR_PACKAGES=(brave-bin rofimoji)
+AUR_PACKAGES=(brave-bin wlogout)
 
 BACKUP_DIR=""
 STAGE_DIR=""
@@ -561,7 +561,7 @@ start_awww() {
 }
 
 finish() {
-    log "09 // MISSION COMPLETE" "NOIR installation finished."
+    log "09 // MISSION COMPLETE" "Installation finished."
 
     success "Configurations deployed."
     success "Wallpaper directory: $WALLPAPER_DIR"
