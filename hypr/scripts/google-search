@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-query=$(rofi -dmenu -i -p "Google:" \
+query=$(rofi -dmenu -i -p "󰍉 " \
     -theme ~/.config/rofi/config.rasi)
 
 [ -z "$query" ] && exit 0

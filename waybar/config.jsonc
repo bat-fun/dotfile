@@ -1,14 +1,12 @@
 {
   "position": "top",
-  "layer": "top",
-  "height": 20,
+  // "layer": "top",
+  // "height": 10,
   "margin": "1px 20px 0px 20px",
   "spacing": 0,
 
   "modules-left": ["custom/arch", "hyprland/workspaces"],
-
   "modules-center": ["hyprland/window"],
-
   "modules-right": [
     // "tray",
     "network",

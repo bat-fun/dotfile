@@ -36,6 +36,9 @@ fi
 wl-copy < "$FILE"
 
 notify \
-    -t 1800 \
-    "Screenshot saved" \
+    -a "Screenshot" \
+    -h "string:x-dunst-stack-tag:screenshot" \
+    -i "$FILE" \
+    -t 3500 \
+    "Screenshot Captured" \
     "$(basename "$FILE")"

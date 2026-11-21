@@ -3,10 +3,7 @@
 * {
   border: none;
   min-height: 0;
-
-  /* font-family: "JetBrainsMono Nerd Font"; */
   font-family: "JetBrainsMono Nerd Font", "FontAwesome";
-
   font-size: 13px;
   font-weight: 500;
 }
@@ -16,10 +13,10 @@
    ========================================================= */
 
 window#waybar {
-  background: transparent;
-  /* background: alpha(@surface,0.70); */
+ /* background: transparent; */
+  background: alpha(@surface,0.90);
   border: none;
-  border-radius: 0;
+  border-radius: 14px;
   padding: 0;
   margin: 0;
 }

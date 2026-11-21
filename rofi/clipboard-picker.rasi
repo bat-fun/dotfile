@@ -1,0 +1,133 @@
+@import "~/.config/matugen/colors/rofi-colors.rasi"
+
+configuration {
+    show-icons: false;
+    kb-cancel: "Escape";
+    kb-accept-entry: "Return";
+}
+
+* {
+    bg:          @noir-bg;
+    surface:     @noir-surface;
+    surface-alt: @noir-surface-alt;
+
+    text:        @noir-text;
+    muted:       @noir-muted;
+    accent:      @noir-accent;
+
+    background-color: transparent;
+    text-color: @text;
+
+    font: "JetBrainsMono Nerd Font 10";
+}
+
+window {
+    transparency: "real";
+    location: center;
+    anchor: center;
+    fullscreen: false;
+    width: 440px;
+
+    enabled: true;
+    border: 1px;
+    border-color: @noir-outline;
+    border-radius: 14px;
+    background-color: @bg;
+    padding: 14px 16px;
+    cursor: "default";
+}
+
+mainbox {
+    enabled: true;
+    spacing: 10px;
+    background-color: transparent;
+    children: [ inputbar, listview ];
+}
+
+/* ── CLIPBOARD SEARCHBAR ──────────────────────────────── */
+inputbar {
+    enabled: true;
+    spacing: 8px;
+    padding: 8px 12px;
+    border: 1px;
+    border-color: @noir-outline;
+    border-radius: 10px;
+    background-color: @surface;
+    text-color: @text;
+    children: [ prompt, entry ];
+}
+
+prompt {
+    enabled: true;
+    background-color: transparent;
+    text-color: @accent;
+    font: "JetBrainsMono Nerd Font Bold 11";
+}
+
+entry {
+    enabled: true;
+    background-color: transparent;
+    text-color: @text;
+    cursor: text;
+    placeholder: "Filter clipboard history...";
+    placeholder-color: @muted;
+}
+
+/* ── CLIPBOARD SNIPPET LIST ───────────────────────────── */
+listview {
+    enabled: true;
+    columns: 1;
+    lines: 7;
+    cycle: true;
+    dynamic: true;
+    scrollbar: false;
+    layout: vertical;
+    reverse: false;
+    fixed-height: false;
+    fixed-columns: true;
+    spacing: 3px;
+    background-color: transparent;
+}
+
+element {
+    enabled: true;
+    spacing: 8px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    background-color: transparent;
+    text-color: @muted;
+    cursor: pointer;
+}
+
+element normal.normal {
+    background-color: transparent;
+    text-color: @muted;
+}
+
+element alternate.normal {
+    background-color: transparent;
+    text-color: @muted;
+}
+
+element selected.normal {
+    background-color: @surface-alt;
+    text-color: @text;
+    border: 1px;
+    border-color: @accent;
+    border-left: 3px;
+    border-left-color: @accent;
+}
+
+element-text {
+    background-color: transparent;
+    text-color: inherit;
+    cursor: inherit;
+    vertical-align: 0.5;
+    horizontal-align: 0.0;
+}
+
+element selected.normal element-text {
+    text-color: @accent;
+    font: "JetBrainsMono Nerd Font Bold 10";
+}
+

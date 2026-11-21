@@ -111,10 +111,10 @@ style = "bold primary"
 
 
 [palettes.matugen]
-primary = "#adc6ff"
-secondary = "#b1c6f7"
-tertiary = "#ffb780"
+primary = "#c7c7bc"
+secondary = "#c8c6c1"
+tertiary = "#d0c3c9"
 error = "#ffb4ab"
-text = "#e1e2eb"
-muted = "#c2c6d5"
-surface = "#0b0e15"
+text = "#e5e2e0"
+muted = "#c7c7be"
+surface = "#0e0e0d"

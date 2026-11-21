@@ -1,16 +1,16 @@
 :root {
-    --bg: #11131a;
-    --surface: #0b0e15;
-    --surface-alt: #272a31;
+    --bg: #141312;
+    --surface: #0e0e0d;
+    --surface-alt: #2a2a29;
 
-    --text: #e1e2eb;
-    --muted: #c2c6d5;
+    --text: #e5e2e0;
+    --muted: #c7c7be;
 
-    --accent: #adc6ff;
-    --secondary: #b1c6f7;
-    --tertiary: #ffb780;
+    --accent: #c7c7bc;
+    --secondary: #c8c6c1;
+    --tertiary: #d0c3c9;
 
     --danger: #ffb4ab;
-    --outline: #8c909f;
-    --signal: #4d8efe;
+    --outline: #919189;
+    --signal: #2c2e26;
 }

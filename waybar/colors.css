@@ -1,15 +1,15 @@
-@define-color bg #11131a;
-@define-color surface #0b0e15;
-@define-color surface_alt #272a31;
-@define-color surface2 #1d2026;
+@define-color bg #141312;
+@define-color surface #0e0e0d;
+@define-color surface_alt #2a2a29;
+@define-color surface2 #201f1f;
 
-@define-color text #e1e2eb;
-@define-color muted #c2c6d5;
+@define-color text #e5e2e0;
+@define-color muted #c7c7be;
 
-@define-color accent #adc6ff;
-@define-color secondary #b1c6f7;
-@define-color tertiary #ffb780;
+@define-color accent #c7c7bc;
+@define-color secondary #c8c6c1;
+@define-color tertiary #d0c3c9;
 
 @define-color danger #ffb4ab;
-@define-color outline #424753;
-@define-color signal #4d8efe;
+@define-color outline #464741;
+@define-color signal #2c2e26;

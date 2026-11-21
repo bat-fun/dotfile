@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# ─────────────────────────────────────────────────────────────
+# OSD (On-Screen Display) feedback script for Dunst / Hyprland
+# Provides smooth, live progress bars and icon feedback
+# ─────────────────────────────────────────────────────────────
+
+notify_volume() {
+    local raw val icon
+    raw=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || echo "Volume: 0")
+
+    if [[ "$raw" =~ \[MUTED\] ]]; then
+        notify-send \
+            -a "System" \
+            -h string:x-dunst-stack-tag:volume \
+            -i audio-volume-muted \
+            -t 1200 \
+            "Volume" "Muted"
+    else
+        val=$(awk '{print int($2 * 100)}' <<< "$raw")
+        val="${val:-0}"
+
+        if (( val >= 65 )); then
+            icon="audio-volume-high"
+        elif (( val >= 25 )); then
+            icon="audio-volume-medium"
+        elif (( val > 0 )); then
+            icon="audio-volume-low"
+        else
+            icon="audio-volume-muted"
+        fi
+
+        notify-send \
+            -a "System" \
+            -h string:x-dunst-stack-tag:volume \
+            -h "int:value:$val" \
+            -i "$icon" \
+            -t 1200 \
+            "Volume" "$val%"
+    fi
+}
+
+notify_brightness() {
+    local val
+    val=$(brightnessctl -m 2>/dev/null | awk -F',' '{gsub("%", "", $4); print $4}' || echo "0")
+    val="${val:-0}"
+
+    notify-send \
+        -a "System" \
+        -h string:x-dunst-stack-tag:brightness \
+        -h "int:value:$val" \
+        -i display-brightness \
+        -t 1200 \
+        "Brightness" "$val%"
+}
+
+notify_mic() {
+    local raw
+    raw=$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@ 2>/dev/null || echo "")
+
+    if [[ "$raw" =~ \[MUTED\] ]]; then
+        notify-send \
+            -a "System" \
+            -h string:x-dunst-stack-tag:mic \
+            -i audio-input-microphone-muted \
+            -t 1400 \
+            "Microphone" "Muted"
+    else
+        notify-send \
+            -a "System" \
+            -h string:x-dunst-stack-tag:mic \
+            -i audio-input-microphone \
+            -t 1400 \
+            "Microphone" "Active"
+    fi
+}
+
+case "${1:-}" in
+    volume)
+        case "${2:-}" in
+            up)
+                wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+
+                notify_volume
+                ;;
+            down)
+                wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+                notify_volume
+                ;;
+            mute)
+                wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+                notify_volume
+                ;;
+            status)
+                notify_volume
+                ;;
+        esac
+        ;;
+    brightness)
+        case "${2:-}" in
+            up)
+                brightnessctl -e4 -n2 set 5%+ >/dev/null 2>&1 || true
+                notify_brightness
+                ;;
+            down)
+                brightnessctl -e4 -n2 set 5%- >/dev/null 2>&1 || true
+                notify_brightness
+                ;;
+            status)
+                notify_brightness
+                ;;
+        esac
+        ;;
+    mic)
+        case "${2:-}" in
+            mute)
+                wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+                notify_mic
+                ;;
+            status)
+                notify_mic
+                ;;
+        esac
+        ;;
+    *)
+        echo "Usage: $0 {volume [up|down|mute]|brightness [up|down]|mic [mute]}"
+        exit 1
+        ;;
+esac

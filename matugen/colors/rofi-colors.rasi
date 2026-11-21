@@ -1,14 +1,14 @@
 * {
-    noir-accent: #adc6ff;
-    noir-secondary: #b1c6f7;
-    noir-tertiary: #ffb780;
-    noir-muted: #c2c6d5;
-    noir-outline: #8c909f;
+    noir-accent: #c7c7bc;
+    noir-secondary: #c8c6c1;
+    noir-tertiary: #d0c3c9;
+    noir-muted: #c7c7be;
+    noir-outline: #919189;
     noir-danger: #ffb4ab;
 
-    noir-bg: #11131a;
-    noir-surface: #0b0e15;
-    noir-surface-alt: #272a31;
-    noir-text: #e1e2eb;
-    noir-signal: #4d8efe;
+    noir-bg: #141312;
+    noir-surface: #0e0e0d;
+    noir-surface-alt: #2a2a29;
+    noir-text: #e5e2e0;
+    noir-signal: #2c2e26;
 }

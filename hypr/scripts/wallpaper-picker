@@ -195,7 +195,7 @@ SELECTED=$(for wallpaper in "${OPTIONS[@]}"; do
         printf '%s\0icon\x1f%s\0display\x1f%s\n' \
             "$wallpaper" "$WALLPAPER_DIR/$wallpaper" "$display"
     fi
-done | rofi -dmenu -i -p "Wallpaper" -theme "$ROFI_THEME")
+done | rofi -dmenu -i -p "󰸉 " -theme "$ROFI_THEME")
 
 [ -z "$SELECTED" ] && exit 0
 

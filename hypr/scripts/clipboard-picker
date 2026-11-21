@@ -16,7 +16,7 @@ require_commands() {
 
 require_commands cliphist rofi wl-copy
 
-SELECTED=$(cliphist list | rofi -dmenu -i -p "Clipboard" -theme ~/.config/rofi/config.rasi)
+SELECTED=$(cliphist list | rofi -dmenu -i -p "󰅌 " -theme ~/.config/rofi/clipboard-picker.rasi)
 
 [ -z "$SELECTED" ] && exit 0
 

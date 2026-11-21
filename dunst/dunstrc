@@ -2,56 +2,101 @@
     monitor = 0
     follow = mouse
     origin = top-right
-    offset = (0, 48)
-    width = 400
-    height = 300
-    notification_limit = 5
+    offset = (16, 32)
+    width = (300, 380)
+    height = (0, 300)
+    notification_limit = 4
+    gap_size = 8
+
+    # Progress bar (volume/brightness visual feedback)
     progress_bar = true
-    progress_bar_height = 3
+    progress_bar_height = 8
     progress_bar_frame_width = 0
-    progress_bar_min_width = 180
-    progress_bar_max_width = 420
+    progress_bar_min_width = 160
+    progress_bar_max_width = 320
+    progress_bar_corner_radius = 4
+
     indicate_hidden = yes
-    transparency = 4
+    transparency = 0
     separator_height = 1
-    padding = 14
-    horizontal_padding = 16
-    text_icon_padding = 10
+    padding = 12
+    horizontal_padding = 14
+    text_icon_padding = 12
     frame_width = 1
     separator_color = frame
-    corner_radius = 4
+    corner_radius = 12
     sort = urgency_descending
     idle_threshold = 120
+
+    # Typography & Hierarchy
     font = JetBrainsMono Nerd Font 10.5
-    line_height = 0
+    line_height = 2
     markup = full
-    format = "<b>%s</b>  %b"
+    format = "<b>%s</b>\n%b"
+    show_age_threshold = 60
     stack_duplicates = true
-    hide_duplicate_count = true
+    hide_duplicate_count = false
     show_indicators = yes
+
+    # Icons
     icon_position = left
     min_icon_size = 32
-    max_icon_size = 48
-    icon_theme = Adwaita
+    max_icon_size = 42
+    icon_theme = breeze-dark, Adwaita
     enable_recursive_icon_lookup = true
+
+    # Context menu & browser integration
+    dmenu = /usr/bin/rofi -dmenu -p "󰂚 " -theme ~/.config/rofi/config.rasi
+    browser = /usr/bin/brave
+
+    # Mouse actions
     mouse_left_click = close_current
-    mouse_middle_click = do_action
+    mouse_middle_click = do_action, close_current
     mouse_right_click = close_all
 
 [urgency_low]
-    background = "#0b0e15"
-    foreground = "#c2c6d5"
-    frame_color = "#b1c6f7"
+    background = "#0e0e0d"
+    foreground = "#c7c7be"
+    frame_color = "#464741"
+    highlight = "#c8c6c1"
     timeout = 4
 
 [urgency_normal]
-    background = "#272a31"
-    foreground = "#e1e2eb"
-    frame_color = "#adc6ff"
+    background = "#2a2a29"
+    foreground = "#e5e2e0"
+    frame_color = "#c7c7bc"
+    highlight = "#c7c7bc"
     timeout = 6
 
 [urgency_critical]
     background = "#93000a"
     foreground = "#ffdad6"
     frame_color = "#ffb4ab"
+    highlight = "#ffb4ab"
     timeout = 0
+
+# ── RULES FOR CLEAN & USEFUL NOTIFICATIONS ─────────────
+[volume]
+    summary = "*volume*"
+    set_stack_tag = "volume"
+    history_ignore = true
+
+[brightness]
+    summary = "*brightness*"
+    set_stack_tag = "brightness"
+    history_ignore = true
+
+[mic]
+    summary = "*Microphone*"
+    set_stack_tag = "mic"
+    history_ignore = true
+
+[clipboard]
+    summary = "*Clipboard*"
+    set_stack_tag = "clipboard"
+    timeout = 2
+
+[screenshot]
+    summary = "*Screenshot*"
+    set_stack_tag = "screenshot"
+    timeout = 4
