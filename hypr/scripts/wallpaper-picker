@@ -41,17 +41,27 @@ if [[ -s "$CACHE_FILE" ]]; then
     CURRENT_WALLPAPER="$(<"$CACHE_FILE")"
 fi
 
+if [[ "${1:-}" == "--restore" && -z "$CURRENT_WALLPAPER" ]]; then
+    exit 0
+fi
+
+if [[ "${1:-}" == "--restore" ]]; then
+    SELECTED="${CURRENT_WALLPAPER##*/}"
+    if [[ "$CURRENT_WALLPAPER" != "$WALLPAPER_DIR/$SELECTED" ||
+          ! -f "$CURRENT_WALLPAPER" ]]; then
+        notify "Wallpaper Picker" "Saved wallpaper is missing or invalid"
+        printf 'Wallpaper Picker: saved wallpaper is missing or invalid: %s\n' \
+            "$CURRENT_WALLPAPER" >&2
+        exit 1
+    fi
+fi
+
 mapfile -d '' -t WALLPAPERS < <(
     find "$WALLPAPER_DIR" -maxdepth 1 -type f \
         \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) \
         -printf '%f\0' |
     sort -z
 )
-
-if [ "${#WALLPAPERS[@]}" -eq 0 ]; then
-    notify "Wallpaper Picker" "No wallpapers found"
-    exit 1
-fi
 
 # ---------------------------------------------------------
 # AWWW transitions
@@ -77,6 +87,7 @@ TRANSITIONS=(
 
 apply_wallpaper() {
     local selected="$1"
+    local quiet="${2:-false}"
     local wallpaper="$WALLPAPER_DIR/$selected"
 
     local transition
@@ -133,10 +144,12 @@ apply_wallpaper() {
     mkdir -p -- "$(dirname -- "$CACHE_FILE")"
     printf '%s\n' "$wallpaper" > "$CACHE_FILE"
 
-    notify \
-        -t 1800 \
-        "Wallpaper changed" \
-        "$selected"
+    if [[ "$quiet" != "true" ]]; then
+        notify \
+            -t 1800 \
+            "Wallpaper changed" \
+            "$selected"
+    fi
 }
 
 if ! pgrep -x "$WALLPAPER_DAEMON" >/dev/null 2>&1; then
@@ -149,6 +162,16 @@ fi
 
 if ! pgrep -x "$WALLPAPER_DAEMON" >/dev/null 2>&1; then
     notify "Wallpaper Picker" "Could not start wallpaper daemon"
+    exit 1
+fi
+
+if [[ "${1:-}" == "--restore" ]]; then
+    apply_wallpaper "$SELECTED" true
+    exit 0
+fi
+
+if [[ "${#WALLPAPERS[@]}" -eq 0 ]]; then
+    notify "Wallpaper Picker" "No wallpapers found"
     exit 1
 fi
 
@@ -183,7 +206,7 @@ SELECTED=$(for wallpaper in "${OPTIONS[@]}"; do
         *$'\n'*) continue ;;
     esac
     if [ "$wallpaper" = "Random" ]; then
-        printf '%s\0icon\x1f%s\0display\x1f%s\0urgent\x1ftrue\n' \
+        printf '%s\0icon\x1f%s\0display\x1f%s\n' \
             "$wallpaper" "preferences-desktop-wallpaper" "Random wallpaper"
     else
         label="${wallpaper%.*}"

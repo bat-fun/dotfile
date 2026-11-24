@@ -1,27 +1,17 @@
 {
   "position": "top",
-  // "layer": "top",
-  // "height": 10,
-  "margin": "1px 20px 0px 20px",
-  "spacing": 0,
+  "layer"   : "top",
+  "margin"  : "1px 1px 0px 1px",
 
-  "modules-left": ["custom/arch", "hyprland/workspaces"],
-  "modules-center": ["hyprland/window"],
-  "modules-right": [
-    // "tray",
-    "network",
-    "bluetooth",
-    // "battery",
-    "pulseaudio",
-    "clock"
-  ],
+  "modules-left"  : ["custom/arch", "hyprland/workspaces"],
+  "modules-center": ["clock"],
+  "modules-right" : ["network", "bluetooth", "pulseaudio"],
+  // "modules-right" : ["tray", "network", "bluetooth", "battery", "pulseaudio" ],
 
   "custom/arch": {
-    "format": " ",// Arch btw
-    // "format": "🗿", //sigma
     // "format": "☣",
-    // "format": "😭🙏",
-    
+    // "format": "🗿", //sigma
+    "format": "",
     "tooltip": true,
     "tooltip-format": "Arch Linux",
     "on-click": "rofi -show drun -theme ~/.config/rofi/config.rasi"

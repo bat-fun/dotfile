@@ -11,6 +11,10 @@ output_path = "~/.config/waybar/colors.css"
 
 [templates.kitty_colors]
 input_path = "~/.config/matugen/templates/kitty-colors.conf"
+output_path = "~/.config/kitty/theme.conf"
+
+[templates.kitty_matugen_colors]
+input_path = "~/.config/matugen/templates/kitty-colors.conf"
 output_path = "~/.config/matugen/colors/kitty-colors.conf"
 
 [templates.rofi_colors]

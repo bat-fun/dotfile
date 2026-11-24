@@ -1,120 +1,41 @@
-"$schema" = 'https://starship.rs/config-schema.json'
-palette = 'matugen'
-
-add_newline = true
-scan_timeout = 30
-command_timeout = 1000
-
 format = """
-[](bold primary)$username$hostname$sudo$directory$git_branch$git_status$python$nodejs$rust$golang$lua$docker_context$fill$cmd_duration$status$time
-[](bold primary)$character"""
+$username$directory $git_branch$git_status
+$character
+"""
 
-continuation_prompt = "[│](bold primary) "
-
-[fill]
-symbol = " "
-
-[character]
-format = "$symbol "
-success_symbol = "[❯](bold secondary)"
-error_symbol = "[❯](bold error)"
-vimcmd_symbol = "[❮](bold primary)"
+command_timeout = 5001
+add_newline = false
+palette = "matugen"
 
 [username]
-style_user = "bold tertiary"
-style_root = "bold error"
-format = "[$user](bold tertiary) "
-show_always = false
-
-[hostname]
-ssh_only = true
-format = "[@$hostname](bold tertiary) "
-
-[sudo]
+style_user = "fg:bg bold bg:accent bold"
+style_root = "bg bold"
+format = "[](bold fg:accent)[$user]($style)[ ](bold fg:accent)"
 disabled = false
-format = "[$symbol]($style)"
-symbol = "⋈ "
-style = "bold tertiary"
+show_always = true
 
 [directory]
-style = "bold primary"
-format = "[$path]($style)[$read_only]($read_only_style) "
-home_symbol = "~"
-truncation_length = 3
-truncation_symbol = "…/"
-read_only = " "
-use_os_path_sep = true
+style = "bg:accent fg:bg bold"
+format = '󰜥 [](bold fg:accent)[󰉋 $path]($style)[](bold fg:accent)'
 
-# Make repository roots visually distinct.
-repo_root_style = "bold primary"
-repo_root_format = "[$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style)[$read_only]($read_only_style) "
+[character]
+success_symbol = "[](bold fg:accent)"
+error_symbol = "[](bold fg:error)"
 
 [git_branch]
-symbol = "󰘬 "
-format = "[$symbol$branch]($style) "
-style = "bold primary"
-truncation_length = 24
-truncation_symbol = "…"
-only_attached = true
+style = "bg:accent fg:bg bold"
+symbol = "󰘬"
+truncation_length = 13
+truncation_symbol = ""
+format = "[](bold fg:accent)[$symbol $branch(:$remote_branch)]($style)[ ](bold fg:accent)"
 
 [git_status]
-style = "bold"
-format = "[$all_status$ahead_behind]($style) "
-
-conflicted = " "
-ahead = "⇡${count} "
-behind = "⇣${count} "
-diverged = "⇕ "
-untracked = "?${count} "
-stashed = "≡${count} "
-modified = "~${count} "
-staged = "+${count} "
-renamed = "»${count} "
-deleted = "✘${count} "
-
-[git_state]
-format = "[$state( $progress_current/$progress_total)]($style) "
-style = "bold tertiary"
-
-[git_metrics]
-disabled = false
-format = "[+$added]($added_style) [-$deleted]($deleted_style) "
-added_style = "bold primary"
-deleted_style = "bold error"
-ignore_submodules = true
-
-[cmd_duration]
-min_time = 2000
-format = "[󱎫 $duration]($style) "
-style = "italic tertiary"
-show_milliseconds = false
-
-[status]
-disabled = false
-format = "[$status]($style) "
-style = "bold error"
-
-[time]
-disabled = false
-format = "[ $time]($style)"
-time_format = "%R"
-style = "dimmed white"
-
-
-# ─────────────────────────────────────────────
-# Useful machine context
-# ─────────────────────────────────────────────
-
-[jobs]
-format = "[▶$number]($style) "
-style = "bold primary"
-
+style = "fg:accent"
+format = '([$all_status$ahead_behind]($style))'
 
 [palettes.matugen]
-primary = "{{colors.primary.dark.hex}}"
-secondary = "{{colors.secondary.dark.hex}}"
-tertiary = "{{colors.tertiary.dark.hex}}"
+bg = "#09080c"
+fg = "{{colors.on_background.dark.hex}}"
+accent = "{{colors.primary.dark.hex}}"
+accentComplementary = "{{colors.secondary.dark.hex}}"
 error = "{{colors.error.dark.hex}}"
-text = "{{colors.on_background.dark.hex}}"
-muted = "{{colors.on_surface_variant.dark.hex}}"
-surface = "{{colors.surface_container_lowest.dark.hex}}"
